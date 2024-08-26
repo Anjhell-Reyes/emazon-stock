@@ -1,5 +1,7 @@
 package bootcamp.emazon.stock.infrastructure.exceptionHandler;
 
+import bootcamp.emazon.stock.domain.api.ICategoriaServicePort;
+import bootcamp.emazon.stock.infrastructure.exception.NoDataFoundException;
 import bootcamp.emazon.stock.infrastructure.input.CategoriaRestController;
 import bootcamp.emazon.stock.application.handler.categoriaHandler.ICategoriaHandler;
 import bootcamp.emazon.stock.infrastructure.exception.CategoriaAlreadyExistsExeption;
@@ -11,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,7 +28,8 @@ public class ControllerAdvisorTest {
     @Autowired
     private MockMvc mockMvc;
 
-
+    @MockBean
+    private ICategoriaServicePort categoriaServicePort;
 
     @MockBean
     private ICategoriaHandler categoriaHandler;
@@ -75,5 +79,15 @@ public class ControllerAdvisorTest {
                         .content("{\"description\": \"ThisDescriptionIsDefinitelyWayTooLongForTheAllowedLength\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"Message\": \"Description must not be null and must be 90 characters or less\"}"));
+    }
+    void testHandleNoDataFoundException() throws Exception {
+        // Simula que el método getAllCategorias() lanza NoDataFoundException
+        Mockito.when(categoriaServicePort.getAllCategorias(Mockito.any(Pageable.class)))
+                .thenThrow(new NoDataFoundException());
+
+        // Realiza la solicitud GET al endpoint /categorias
+        mockMvc.perform(get("/categorias?page=0&size=10"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json("{\"Message\": \"No data found\"}"));
     }
 }

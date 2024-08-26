@@ -14,10 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -90,7 +95,49 @@ public class CategoriaHandlerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value(categoriaNombre));
     }
+    @Test
+    void getAllCategoriasFromStock_shouldReturnPaginatedCategoriaResponses() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        String sort = "nombre";
+        String direction = "ASC";
 
+        Categoria categoria1 = new Categoria();
+        categoria1.setId(1L);
+        categoria1.setNombre("Categoria1");
+        categoria1.setDescripcion("Decripcion1");
+        Categoria categoria2 = new Categoria();
+        categoria2.setId(2L);
+        categoria2.setNombre("Categoria2");
+        categoria2.setDescripcion("Decripcion2");
+        List<Categoria> categorias = List.of(categoria1, categoria2);
+
+        CategoriaResponse response1 = new CategoriaResponse();
+        response1.setId(1L);
+        response1.setNombre("Categoria1");
+        response1.setDescripcion("Descripcion1");
+        CategoriaResponse response2 = new CategoriaResponse();
+        response2.setId(2L);
+        response2.setNombre("Categoria2");
+        response2.setDescripcion("Descripcion2");
+        List<CategoriaResponse> categoriaResponses = List.of(response1, response2);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort));
+        Page<Categoria> categoriaPage = new PageImpl<>(categorias, pageable, categorias.size());
+
+        when(categoriaServicePort.getAllCategorias(pageable)).thenReturn(categoriaPage);
+        when(categoriaMapper.toResponse(categoria1)).thenReturn(response1);
+        when(categoriaMapper.toResponse(categoria2)).thenReturn(response2);
+
+        // Act
+        Page<CategoriaResponse> result = categoriaHandler.getAllCategoriasFromStock(page, size, sort, direction);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(categorias.size());
+        assertThat(result.getContent()).isEqualTo(categoriaResponses);
+    }
     @Test
     void testUpdateCategoriaInStock() throws Exception {
         // Datos de prueba

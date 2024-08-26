@@ -64,6 +64,31 @@ public class CategoriaRestControllerTest {
     }
 
     @Test
+    void testGetCategoriasFromStock() throws Exception {
+        // Preparar datos de prueba
+        CategoriaResponse categoriaResponse = new CategoriaResponse();
+        categoriaResponse.setId(1L);
+        categoriaResponse.setNombre("Categoria1");
+        categoriaResponse.setDescripcion("Descripcion1");
+        Page<CategoriaResponse> categoriaPage = new PageImpl<>(Collections.singletonList(categoriaResponse));
+
+        // Configurar Mockito para que devuelva los datos de prueba
+        when(categoriaHandler.getAllCategoriasFromStock(any(Integer.class), any(Integer.class), any(String.class), any(String.class)))
+                .thenReturn(categoriaPage);
+
+        // Ejecutar la solicitud GET y verificar la respuesta
+        mockMvc.perform(get("/categorias")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "nombre")
+                        .param("direction", "asc")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(categoriaPage)));
+    }
+
+
+    @Test
      void testUpdateCategoriaInStock() throws Exception {
         CategoriaRequest categoriaRequest = new CategoriaRequest();
         // Configura tu objeto categoriaRequest con los datos necesarios

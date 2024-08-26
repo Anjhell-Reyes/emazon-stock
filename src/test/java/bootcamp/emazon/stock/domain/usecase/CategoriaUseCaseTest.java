@@ -8,13 +8,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class CategoriaUseCaseTest {
 
-        @Autowired
+        @Mock
         private ICategoriaServicePort categoriaServicePort;
 
         @Mock
@@ -53,7 +61,36 @@ public class CategoriaUseCaseTest {
             verify(categoriaPersistencePort, times(1)).getCategoria("Electrónica");
         }
 
-        @Test
+    @Test
+    void getAllCategorias_shouldReturnPaginatedCategorias() {
+        // Arrange
+        Categoria categoria1 = new Categoria();
+        categoria1.setId(1L);
+        categoria1.setNombre("Categoria1");
+        categoria1.setDescripcion("Descripcion1");
+        Categoria categoria2 = new Categoria();
+        categoria2.setId(2L);
+        categoria2.setNombre("Categoria2");
+        categoria2.setDescripcion("Descripcion2");
+
+        List<Categoria> categorias = Arrays.asList(categoria1, categoria2);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Categoria> page = new PageImpl<>(categorias, pageable, categorias.size());
+
+        when(categoriaPersistencePort.getAllCategorias(pageable)).thenReturn(page);
+
+        // Act
+        Page<Categoria> result = categoriaUseCase.getAllCategorias(pageable);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).getNombre()).isEqualTo("Categoria1");
+        assertThat(result.getContent().get(1).getNombre()).isEqualTo("Categoria2");
+    }
+
+    @Test
          void testUpdateCategoria() {
             Categoria categoria = new Categoria(1L, "Electrónica", "Productos electrónicos");
 

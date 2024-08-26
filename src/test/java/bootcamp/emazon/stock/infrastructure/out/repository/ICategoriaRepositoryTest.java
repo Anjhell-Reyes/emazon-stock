@@ -58,5 +58,23 @@ public class ICategoriaRepositoryTest {
         assertThat(found).isNotPresent();
     }
 
+    @Test
+    void testFindAllWithPageable() {
+        // Preparar datos de prueba
+        CategoriaEntity categoriaEntity = new CategoriaEntity();
+        categoriaEntity.setNombre("Categoria Test");
+        categoriaEntity.setDescripcion("Descripcion Test");
+        categoriaRepository.save(categoriaEntity);
 
+        // Configurar Pageable
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "nombre"));
+
+        // Ejecutar el método
+        Page<CategoriaEntity> result = categoriaRepository.findAll(pageable);
+
+        // Verificar el resultado
+        assertFalse(result.isEmpty(), "La página no debe estar vacía");
+        assertEquals(1, result.getTotalElements(), "Debe haber un elemento en el resultado");
+        assertEquals("Categoria Test", result.getContent().get(0).getNombre(), "El nombre debe coincidir");
+    }
 }

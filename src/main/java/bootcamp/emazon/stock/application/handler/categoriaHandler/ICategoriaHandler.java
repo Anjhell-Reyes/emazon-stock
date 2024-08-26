@@ -13,5 +13,6 @@ public interface ICategoriaHandler{
     void updateCategoriaInStock(CategoriaRequest categoriaRequest);
     void deleteCategoriaInStock(String categoriaNombre);
 
+    Page<CategoriaResponse> getAllCategoriasFromStock(int page, int size, String sort, String direction);
 
 }

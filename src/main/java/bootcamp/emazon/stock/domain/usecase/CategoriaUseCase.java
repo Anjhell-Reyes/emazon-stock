@@ -24,6 +24,10 @@ public class CategoriaUseCase implements ICategoriaServicePort {
         return categoriaPersistencePort.getCategoria(categoriaNombre);
     }
 
+    @Override
+    public Page<Categoria> getAllCategorias(Pageable pageable) {
+        return categoriaPersistencePort.getAllCategorias(pageable);
+    }
 
 
     @Override

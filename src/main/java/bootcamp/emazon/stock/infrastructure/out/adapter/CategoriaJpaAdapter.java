@@ -38,7 +38,15 @@ public class CategoriaJpaAdapter implements ICategoriaPersistencePort {
         return categoriaEntityMapper.toCategoria(categoriaRepository.findByNombre(categoriaNombre).orElseThrow(CategoriaNotFoundException::new));
     }
 
+    @Override
+    public Page<Categoria> getAllCategorias(Pageable pageable) {
+        Page<CategoriaEntity> categoriaEntities = categoriaRepository.findAll(pageable);
 
+        if(categoriaEntities.isEmpty()){
+            throw new NoDataFoundException();
+        }
+        return categoriaEntities.map(categoriaEntityMapper::toCategoria);
+    }
 
     @Override
     public void updateCategoria(Categoria categoria) { categoriaRepository.save(categoriaEntityMapper.toEntity(categoria));}

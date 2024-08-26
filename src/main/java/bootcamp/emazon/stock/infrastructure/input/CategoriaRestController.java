@@ -45,6 +45,23 @@ public class CategoriaRestController {
         return ResponseEntity.ok(categoriaHandler.getCategoriaFromStock(categoriaNombre));
     }
 
+    @Operation(summary = "Get paginated categorias")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paged categorias returned",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
+    })
+
+    @GetMapping
+    public ResponseEntity<Page<CategoriaResponse>> getCategoriasFromStock(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "nombre") String sort,
+            @RequestParam(defaultValue = "asc") String direction) {
+        Page<CategoriaResponse> categorias = categoriaHandler.getAllCategoriasFromStock(page, size, sort, direction);
+        return ResponseEntity.ok(categorias);
+    }
 
 
     @Operation(summary = "Update an existing categoria")

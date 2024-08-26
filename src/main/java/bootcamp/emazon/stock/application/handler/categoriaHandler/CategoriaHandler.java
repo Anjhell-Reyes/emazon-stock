@@ -40,6 +40,13 @@ public class CategoriaHandler implements  ICategoriaHandler{
         return categoriaMapper.toResponse(categoria);
     }
 
+    @Override
+    public Page<CategoriaResponse> getAllCategoriasFromStock(int page, int size, String sort, String direction) {
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        Page<Categoria> categoriaPage = categoriaServicePort.getAllCategorias(pageable);
+        return categoriaPage.map(categoriaMapper::toResponse);
+    }
 
     @Override
     public void updateCategoriaInStock(CategoriaRequest categoriaRequest){

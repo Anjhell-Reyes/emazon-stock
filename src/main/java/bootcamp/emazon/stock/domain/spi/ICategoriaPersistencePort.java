@@ -10,6 +10,7 @@ public interface ICategoriaPersistencePort {
 
     Categoria getCategoria(String categoriaNombre);
 
+    Page<Categoria> getAllCategorias(Pageable pageable);
 
     void updateCategoria(Categoria categoria);
     void deleteCategoria(String categoriaNombre);

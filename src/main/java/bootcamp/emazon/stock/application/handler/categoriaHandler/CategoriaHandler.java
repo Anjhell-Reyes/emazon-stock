@@ -27,7 +27,7 @@ public class CategoriaHandler implements  ICategoriaHandler{
         if (categoriaRequest.getNombre() == null || categoriaRequest.getNombre().length() > 50) {
             throw new NamenotnullOrMax50Characters();
         }
-        if (categoriaRequest.getDescripcion() == null || categoriaRequest.getDescripcion().length() > 90) {
+        if (categoriaRequest.getDescripcion() == null || categoriaRequest.getDescripcion().isEmpty() || categoriaRequest.getDescripcion().length() > 90) {
             throw new DescriptionNotnullOrMax90Characters();
         }
         Categoria categoria = categoriaMapper.toCategoria(categoriaRequest);

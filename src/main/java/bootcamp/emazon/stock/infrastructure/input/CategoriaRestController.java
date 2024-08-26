@@ -46,6 +46,7 @@ public class CategoriaRestController {
     }
 
 
+
     @Operation(summary = "Update an existing categoria")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria updated", content = @Content),

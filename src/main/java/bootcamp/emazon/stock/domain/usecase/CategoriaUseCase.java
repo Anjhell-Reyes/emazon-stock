@@ -25,6 +25,7 @@ public class CategoriaUseCase implements ICategoriaServicePort {
     }
 
 
+
     @Override
     public void updateCategoria(Categoria categoria) {
         categoriaPersistencePort.updateCategoria(categoria);

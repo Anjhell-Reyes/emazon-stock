@@ -39,3 +39,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.register('integrationTest', Test) {
+	useJUnitPlatform()
+	include '**/*IntegrationTest.class'
+}

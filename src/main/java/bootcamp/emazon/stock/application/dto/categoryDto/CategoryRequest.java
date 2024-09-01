@@ -1,4 +1,4 @@
-package bootcamp.emazon.stock.application.dto.categoriaDto;
+package bootcamp.emazon.stock.application.dto.categoryDto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

@@ -1,8 +1,8 @@
 package bootcamp.emazon.stock.infrastructure.input;
 
-import bootcamp.emazon.stock.application.dto.categoriaDto.CategoryRequest;
-import bootcamp.emazon.stock.application.dto.categoriaDto.CategoryResponse;
-import bootcamp.emazon.stock.application.handler.categoriaHandler.ICategoryHandler;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
+import bootcamp.emazon.stock.application.handler.categoryHandler.ICategoryHandler;
 import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
 import bootcamp.emazon.stock.infrastructure.exception.CategoryAlreadyExistsException;
 import bootcamp.emazon.stock.infrastructure.exception.CategoryNotFoundException;

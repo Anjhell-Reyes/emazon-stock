@@ -1,4 +1,4 @@
-package bootcamp.emazon.stock.application.handler.categoriaHandler;
+package bootcamp.emazon.stock.application.handler.categoryHandler;
 
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;

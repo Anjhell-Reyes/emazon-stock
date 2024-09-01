@@ -1,7 +1,7 @@
 package bootcamp.emazon.stock.application.handler.categoriaHandler;
 
-import bootcamp.emazon.stock.application.dto.categoriaDto.CategoryRequest;
-import bootcamp.emazon.stock.application.dto.categoriaDto.CategoryResponse;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
 import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
 
 import java.util.List;

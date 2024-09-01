@@ -1,11 +1,11 @@
 package bootcamp.emazon.stock.infrastructure.configuration;
 
-import bootcamp.emazon.stock.domain.api.ICategoriaServicePort;
-import bootcamp.emazon.stock.domain.spi.ICategoriaPersistencePort;
-import bootcamp.emazon.stock.domain.usecase.CategoriaUseCase;
-import bootcamp.emazon.stock.infrastructure.out.adapter.CategoriaJpaAdapter;
-import bootcamp.emazon.stock.infrastructure.out.mapper.CategoriaEntityMapper;
-import bootcamp.emazon.stock.infrastructure.out.repository.ICategoriaRepository;
+import bootcamp.emazon.stock.domain.api.ICategoryServicePort;
+import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
+import bootcamp.emazon.stock.domain.usecase.CategoryUseCase;
+import bootcamp.emazon.stock.infrastructure.out.adapter.CategoryJpaAdapter;
+import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
+import bootcamp.emazon.stock.infrastructure.out.repository.ICategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,16 +13,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class BeanConfiguration {
-    private final ICategoriaRepository categoriaRepository;
-    private final CategoriaEntityMapper categoriaEntityMapper;
+    private final ICategoryRepository categoryRepository;
+    private final CategoryEntityMapper categoryEntityMapper;
 
     @Bean
-    public ICategoriaPersistencePort categoriaPersistencePort(){
-        return new CategoriaJpaAdapter(categoriaRepository, categoriaEntityMapper);
+    public ICategoryPersistencePort categoryPersistencePort(){
+        return new CategoryJpaAdapter(categoryRepository, categoryEntityMapper);
     }
 
     @Bean
-    public ICategoriaServicePort categoriaServicePort() {
-        return new CategoriaUseCase(categoriaPersistencePort());
+    public ICategoryServicePort categoryServicePort() {
+        return new CategoryUseCase(categoryPersistencePort());
     }
 }

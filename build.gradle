@@ -29,11 +29,13 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.3.0'
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.10'
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 	runtimeOnly 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
-	implementation 'io.swagger.core.v3:swagger-core:2.2.8'
+	implementation 'io.swagger.core.v3:swagger-core:2.2.22'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
 }
 
 tasks.named('test') {

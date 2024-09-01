@@ -23,9 +23,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(CategoryRestController.class)
-class BrandRestControllerTest {
+@WebMvcTest(BrandRestController.class)
+class BrandRestControllerIntegrationTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
     @MockBean
@@ -34,10 +35,6 @@ class BrandRestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void testSaveBrandInStock() throws Exception {

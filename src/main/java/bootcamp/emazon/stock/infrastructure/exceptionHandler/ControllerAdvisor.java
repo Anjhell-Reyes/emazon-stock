@@ -19,7 +19,14 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleCategoryAlreadyExistsException(
             CategoryAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORIA_ALREADY_EXISTS.getMessage()));
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORY_ALREADY_EXISTS.getMessage()));
+    }
+
+    @ExceptionHandler(BrandAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleBrandAlreadyExistsException(
+            BrandAlreadyExistsException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.BRAND_ALREADY_EXISTS.getMessage()));
     }
 
     @ExceptionHandler(NoDataFoundException.class)
@@ -33,7 +40,14 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleCategoryNotFoundException(
             CategoryNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORIA_NOT_FOUND.getMessage()));
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORY_NOT_FOUND.getMessage()));
+    }
+
+    @ExceptionHandler(BrandNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleBrandNotFoundException(
+            BrandNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.BRAND_NOT_FOUND.getMessage()));
     }
 
     @ExceptionHandler(NamenotnullException.class)
@@ -62,6 +76,13 @@ public class ControllerAdvisor {
             DescriptionMax90CharactersException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.DESCRIPTION_MAX_LENGHT.getMessage()));
+    }
+
+    @ExceptionHandler(DescriptionMax120CharactersException.class)
+    public ResponseEntity<Map<String, String>> handleDescriptionMax120CharactersException(
+            DescriptionMax120CharactersException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.DESCRIPTION_MAX_LENGHT_BRAND.getMessage()));
     }
 
     @ExceptionHandler(InvalidPageIndexException.class)

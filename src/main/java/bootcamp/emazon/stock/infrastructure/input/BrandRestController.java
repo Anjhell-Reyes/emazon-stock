@@ -35,7 +35,7 @@ public class BrandRestController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "Get a brand by their id")
+    @Operation(summary = "Get a brand by their name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Brand found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = BrandResponse.class))),

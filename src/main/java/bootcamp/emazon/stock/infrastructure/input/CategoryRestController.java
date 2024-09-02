@@ -36,7 +36,7 @@ public class CategoryRestController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "Get a category by their id")
+    @Operation(summary = "Get a category by their name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))),

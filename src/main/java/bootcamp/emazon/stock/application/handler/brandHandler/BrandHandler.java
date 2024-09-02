@@ -6,9 +6,12 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.mapper.BrandMapper;
 import bootcamp.emazon.stock.domain.api.IBrandServicePort;
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,11 @@ public class BrandHandler implements IBrandHandler{
     public BrandResponse getBrandFromStock(String brandName){
         Brand brand = brandServicePort.getBrand(brandName);
         return brandMapper.toResponse(brand);
+    }
+
+    @Override
+    public List<BrandPaginated> getAllBrandsFromStock(int page, int size, String sortBy, boolean asc) {
+        return brandServicePort.getAllBrands(page, size, sortBy, asc);
     }
 
     @Override

@@ -6,8 +6,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.infrastructure.exception.BrandAlreadyExistsException;
 import bootcamp.emazon.stock.infrastructure.exception.BrandNotFoundException;
+import bootcamp.emazon.stock.infrastructure.exception.NoDataFoundException;
 import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.BrandEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.IBrandRepository;
@@ -16,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +80,41 @@ public class BrandJpaAdapterTest {
 
         assertNotNull(result);
         assertEquals("Test Brand", result.getName());
+    }
+
+    @Test
+    void testGetAllBrands_NoDataFound() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
+        when(brandRepository.findAll(pageable)).thenReturn(Page.empty());
+
+        assertThrows(NoDataFoundException.class, () -> brandJpaAdapter.getAllBrands(0, 10, "name", true));
+    }
+
+    @Test
+    void testGetAllBrands_Success() {
+        // Configura un BrandEntity con datos de prueba
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setId(1L);
+        brandEntity.setName("Test Brand");
+        brandEntity.setDescription("Test Description");
+
+        // Configura la lista de BrandEntity y la página
+        List<BrandEntity> entities = Collections.singletonList(brandEntity);
+        Page<BrandEntity> page = new PageImpl<>(entities);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
+
+        // Configura el mock para devolver la página de BrandEntity
+        when(brandRepository.findAll(pageable)).thenReturn(page);
+
+        // Ejecuta el método a probar
+        List<BrandPaginated> result = brandJpaAdapter.getAllBrands(0, 10, "name", true);
+
+        // Verifica el resultado
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals("Test Brand", result.get(0).getName());
+        assertEquals("Test Description", result.get(0).getDescription());
     }
 
     @Test

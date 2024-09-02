@@ -3,7 +3,10 @@ package bootcamp.emazon.stock.domain.usecase;
 import bootcamp.emazon.stock.domain.api.IBrandServicePort;
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
+
+import java.util.List;
 
 public class BrandUseCase implements IBrandServicePort {
 
@@ -40,6 +43,15 @@ public class BrandUseCase implements IBrandServicePort {
     @Override
     public Brand getBrand(String brandName){
         return brandPersistencePort.getBrand(brandName);
+    }
+
+    @Override
+    public List<BrandPaginated> getAllBrands(int page, int size, String sortBy, boolean asc) {
+        if (page < 0) {
+            throw new InvalidPageIndexException();
+        }
+        int offset = (page - 1) * size;
+        return brandPersistencePort.getAllBrands(offset, size, sortBy, asc);
     }
 
     @Override

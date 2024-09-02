@@ -112,7 +112,6 @@ public class CategoryJpaAdapterTest {
         assertEquals(1, result.size());
     }
 
-
     @Test
     void testUpdateCategory() {
         Category category = new Category();

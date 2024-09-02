@@ -1,14 +1,19 @@
 package bootcamp.emazon.stock.domain.usecase;
 
 import bootcamp.emazon.stock.domain.exception.DescriptionNotnullException;
+import bootcamp.emazon.stock.domain.exception.InvalidPageIndexException;
 import bootcamp.emazon.stock.domain.exception.NamenotnullException;
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,6 +71,27 @@ class BrandUseCaseTest {
         // Assert
         assertEquals(brand, result);
         verify(brandPersistencePort, times(1)).getBrand("ValidName");
+    }
+
+    @Test
+    void testGetAllBrands_Success() {
+        // Arrange
+        BrandPaginated paginatedBrand = new BrandPaginated(1L, "ValidName", "ValidDescription");
+        List<BrandPaginated> brands = Collections.singletonList(paginatedBrand);
+        when(brandPersistencePort.getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(brands);
+
+        // Act
+        List<BrandPaginated> result = brandUseCase.getAllBrands(1, 10, "name", true);
+
+        // Assert
+        assertEquals(brands, result);
+        verify(brandPersistencePort, times(1)).getAllBrands(0, 10, "name", true);
+    }
+
+    @Test
+    void testGetAllBrands_InvalidPage() {
+        // Act & Assert
+        assertThrows(InvalidPageIndexException.class, () -> brandUseCase.getAllBrands(-1, 10, "name", true));
     }
 
     @Test

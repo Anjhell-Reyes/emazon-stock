@@ -5,6 +5,7 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.mapper.BrandMapper;
 import bootcamp.emazon.stock.domain.api.IBrandServicePort;
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,6 +95,29 @@ class BrandHandlerTest {
 
         // Verificación de resultados
         assertEquals(expectedResponse, actuallyResponse);
+    }
+
+    @Test
+    void testGetAllBrandsFromStock() {
+        // Datos simulados
+        int page = 0;
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+
+        BrandPaginated brand1 = new BrandPaginated(1L, "Brand 1", "Description 1");
+        BrandPaginated brand2 = new BrandPaginated(2L, "Brand 2", "Description 2");
+
+        List<BrandPaginated> expectedBrands = Arrays.asList(brand1, brand2);
+
+        // Simulación del comportamiento del mock
+        when(brandServicePort.getAllBrands(page, size, sortBy, asc)).thenReturn(expectedBrands);
+
+        // Llamada al método a probar
+        List<BrandPaginated> actualBrands = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
+
+        // Verificación de resultados
+        assertEquals(expectedBrands, actualBrands);
     }
 
     @Test

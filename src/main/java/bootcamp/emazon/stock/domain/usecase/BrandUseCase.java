@@ -55,6 +55,11 @@ public class BrandUseCase implements IBrandServicePort {
     }
 
     @Override
+    public List<Brand> getAll(){
+        return brandPersistencePort.getAll();
+    }
+
+    @Override
     public void updateBrand(Brand brand) {
         if (brand.getName() == null) {
             throw new NamenotnullException();

@@ -14,6 +14,8 @@ public interface IBrandPersistencePort {
 
     List<BrandPaginated> getAllBrands(int offset, int limit, String sortBy, boolean asc);
 
+    List<Brand> getAll();
+
     void updateBrand(Brand brand);
     void deleteBrand(String brandName);
 }

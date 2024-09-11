@@ -1,11 +1,10 @@
 package bootcamp.emazon.stock.domain.usecase;
 
-import bootcamp.emazon.stock.domain.exception.DescriptionNotnullException;
-import bootcamp.emazon.stock.domain.exception.InvalidPageIndexException;
-import bootcamp.emazon.stock.domain.exception.NamenotnullException;
+import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,105 +26,128 @@ class BrandUseCaseTest {
     @InjectMocks
     private BrandUseCase brandUseCase;
 
-    @Test
-    void testSaveBrand_Success() {
-        // Arrange
-        Brand brand = new Brand(1L, "ValidName", "ValidDescription");
-        when(brandPersistencePort.saveBrand(any(Brand.class))).thenReturn(brand);
+    private Brand brand;
 
-        // Act
-        Brand result = brandUseCase.saveBrand(brand);
-
-        // Assert
-        assertEquals(brand, result);
-        verify(brandPersistencePort, times(1)).saveBrand(brand);
+    @BeforeEach
+    void setUp() {
+        brand = new Brand(1L, "Samsung", "Technology and gadgets");
     }
 
     @Test
-    void testSaveBrand_InvalidName() {
-        // Arrange
-        Brand brand = new Brand(1L, "", "ValidDescription");
+    void saveBrand_Success() {
+        when(brandPersistencePort.saveBrand(any(Brand.class))).thenReturn(brand);
 
-        // Act & Assert
+        Brand savedBrand = brandUseCase.saveBrand(brand);
+
+        assertNotNull(savedBrand);
+        assertEquals(brand.getName(), savedBrand.getName());
+        verify(brandPersistencePort, times(1)).saveBrand(any(Brand.class));
+    }
+
+    @Test
+    void saveBrand_ShouldThrowNamenotnullException_WhenNameIsNull() {
+        brand.setName(null);
+
         assertThrows(NamenotnullException.class, () -> brandUseCase.saveBrand(brand));
     }
 
     @Test
-    void testSaveBrand_InvalidDescription() {
-        // Arrange
-        Brand brand = new Brand(1L, "ValidName", "");
+    void saveBrand_ShouldThrowNameMax50CharactersException_WhenNameExceedsMaxLength() {
+        brand.setName("A".repeat(51)); // nombre de 51 caracteres
 
-        // Act & Assert
+        assertThrows(NameMax50CharactersException.class, () -> brandUseCase.saveBrand(brand));
+    }
+
+    @Test
+    void saveBrand_ShouldThrowDescriptionNotnullException_WhenDescriptionIsNull() {
+        brand.setDescription(null);
+
         assertThrows(DescriptionNotnullException.class, () -> brandUseCase.saveBrand(brand));
     }
 
     @Test
-    void testGetBrand_Success() {
-        // Arrange
-        Brand brand = new Brand(1L, "ValidName", "ValidDescription");
-        when(brandPersistencePort.getBrand("ValidName")).thenReturn(brand);
+    void saveBrand_ShouldThrowDescriptionEmptyException_WhenDescriptionIsEmpty() {
+        brand.setDescription("");
 
-        // Act
-        Brand result = brandUseCase.getBrand("ValidName");
-
-        // Assert
-        assertEquals(brand, result);
-        verify(brandPersistencePort, times(1)).getBrand("ValidName");
+        assertThrows(DescriptionEmptyException.class, () -> brandUseCase.saveBrand(brand));
     }
 
     @Test
-    void testGetAllBrands_Success() {
-        // Arrange
-        BrandPaginated paginatedBrand = new BrandPaginated(1L, "ValidName", "ValidDescription");
-        List<BrandPaginated> brands = Collections.singletonList(paginatedBrand);
-        when(brandPersistencePort.getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(brands);
+    void saveBrand_ShouldThrowDescriptionMax120CharactersException_WhenDescriptionExceedsMaxLength() {
+        brand.setDescription("A".repeat(121)); // descripción de 121 caracteres
 
-        // Act
-        List<BrandPaginated> result = brandUseCase.getAllBrands(1, 10, "name", true);
-
-        // Assert
-        assertEquals(brands, result);
-        verify(brandPersistencePort, times(1)).getAllBrands(0, 10, "name", true);
+        assertThrows(DescriptionMax120CharactersException.class, () -> brandUseCase.saveBrand(brand));
     }
 
     @Test
-    void testGetAllBrands_InvalidPage() {
-        // Act & Assert
+    void getBrand_Success() {
+        when(brandPersistencePort.getBrand(anyString())).thenReturn(brand);
+
+        Brand foundBrand = brandUseCase.getBrand("Samsung");
+
+        assertNotNull(foundBrand);
+        assertEquals("Samsung", foundBrand.getName());
+        verify(brandPersistencePort, times(1)).getBrand(anyString());
+    }
+
+    @Test
+    void getAllBrands_Success() {
+        List<BrandPaginated> paginatedBrands = Collections.singletonList(new BrandPaginated(1L, "Samsung", "Technology"));
+        when(brandPersistencePort.getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(paginatedBrands);
+
+        List<BrandPaginated> brands = brandUseCase.getAllBrands(1, 10, "name", true);
+
+        assertNotNull(brands);
+        assertEquals(1, brands.size());
+        verify(brandPersistencePort, times(1)).getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void getAllBrands_ShouldThrowInvalidPageIndexException_WhenPageIsNegative() {
         assertThrows(InvalidPageIndexException.class, () -> brandUseCase.getAllBrands(-1, 10, "name", true));
     }
 
     @Test
-    void testUpdateBrand_Success() {
-        // Arrange
-        Brand brand = new Brand(1L, "ValidName", "ValidDescription");
-        doNothing().when(brandPersistencePort).updateBrand(any(Brand.class));
+    void getAll_Success() {
+        List<Brand> brands = Collections.singletonList(brand);
+        when(brandPersistencePort.getAll()).thenReturn(brands);
 
-        // Act
-        assertDoesNotThrow(() -> brandUseCase.updateBrand(brand));
+        List<Brand> allBrands = brandUseCase.getAll();
 
-        // Assert
-        verify(brandPersistencePort, times(1)).updateBrand(brand);
+        assertNotNull(allBrands);
+        assertEquals(1, allBrands.size());
+        verify(brandPersistencePort, times(1)).getAll();
     }
 
     @Test
-    void testUpdateBrand_InvalidName() {
-        // Arrange
-        Brand brand = new Brand(1L, "", "ValidDescription");
+    void updateBrand_Success() {
+        doNothing().when(brandPersistencePort).updateBrand(any(Brand.class));
 
-        // Act & Assert
+        brandUseCase.updateBrand(brand);
+
+        verify(brandPersistencePort, times(1)).updateBrand(any(Brand.class));
+    }
+
+    @Test
+    void updateBrand_ShouldThrowNamenotnullException_WhenNameIsNull() {
+        brand.setName(null);
+
         assertThrows(NamenotnullException.class, () -> brandUseCase.updateBrand(brand));
     }
 
     @Test
-    void testDeleteBrand_Success() {
-        // Arrange
-        doNothing().when(brandPersistencePort).deleteBrand("ValidName");
+    void updateBrand_ShouldThrowDescriptionNotnullException_WhenDescriptionIsNull() {
+        brand.setDescription(null);
 
-        // Act
-        assertDoesNotThrow(() -> brandUseCase.deleteBrand("ValidName"));
-
-        // Assert
-        verify(brandPersistencePort, times(1)).deleteBrand("ValidName");
+        assertThrows(DescriptionNotnullException.class, () -> brandUseCase.updateBrand(brand));
     }
 
+    @Test
+    void deleteBrand_Success() {
+        doNothing().when(brandPersistencePort).deleteBrand(anyString());
+
+        brandUseCase.deleteBrand("Samsung");
+
+        verify(brandPersistencePort, times(1)).deleteBrand(anyString());
+    }
 }

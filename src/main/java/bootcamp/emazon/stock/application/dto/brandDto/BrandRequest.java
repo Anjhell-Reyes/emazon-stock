@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class BrandRequest {
         @NotBlank(message = "The name cannot be blank")
         @NotNull(message = "The name cannot be null")
@@ -21,4 +21,5 @@ public class BrandRequest {
         @NotEmpty(message = "Description cannot be empty")
         @Size(max = 120, message = "The description cannot be more than 120 characters")
         private String description;
+
 }

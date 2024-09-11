@@ -1,19 +1,21 @@
 package bootcamp.emazon.stock.infrastructure.exceptionHandler;
 
 import bootcamp.emazon.stock.domain.exception.*;
-import bootcamp.emazon.stock.infrastructure.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class ControllerAdvisor {
 
     private static final String MESSAGE = "Message";
+    private static final String AVAILABLE_BRANDS = "availableBrands";
+
 
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleCategoryAlreadyExistsException(
@@ -22,9 +24,9 @@ public class ControllerAdvisor {
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORY_ALREADY_EXISTS.getMessage()));
     }
 
-    @ExceptionHandler(BrandAlreadyExistsException.class)
+    @ExceptionHandler(DescriptionMax120CharactersException.BrandAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleBrandAlreadyExistsException(
-            BrandAlreadyExistsException exception) {
+            DescriptionMax120CharactersException.BrandAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.BRAND_ALREADY_EXISTS.getMessage()));
     }
@@ -33,7 +35,7 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleNoDataFoundException(
             NoDataFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.NO_DATA_FOUND.getMessage()));
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.ARTICLE_ALREADY_EXISTS.getMessage()));
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
@@ -90,5 +92,36 @@ public class ControllerAdvisor {
             InvalidPageIndexException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.PAGE_INVALID.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidNumberOfCategoriesException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidNumberOfCategoriesException(
+            InvalidNumberOfCategoriesException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.INVALID_NUMBER_CATEGORIES.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateCategoriesException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateCategoriesException(
+            DuplicateCategoriesException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.DUPLICATE_CATEGORIES.getMessage()));
+    }
+
+    @ExceptionHandler(ArticleAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleArticleAlreadyExistsException(
+            ArticleAlreadyExistsException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.DUPLICATE_CATEGORIES.getMessage()));
+    }
+
+    @ExceptionHandler(AvailableBrandsException.class)
+    public ResponseEntity<Map<String, Object>> handleAvailableBrandsException(
+            AvailableBrandsException exception) {
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put(MESSAGE, ExceptionResponse.BRAND_NOT_FOUND.getMessage());
+        responseBody.put(AVAILABLE_BRANDS, exception.getAvailableBrands());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 }

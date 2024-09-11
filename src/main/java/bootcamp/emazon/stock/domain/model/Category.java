@@ -1,5 +1,7 @@
 package bootcamp.emazon.stock.domain.model;
 
+import java.util.Objects;
+
 public class Category {
     private Long id;
     private String name;
@@ -10,12 +12,21 @@ public class Category {
 
     public Category(Long id, String name, String description) {
         this.id = id;
-        if(!name.isEmpty() && name.length() < 50) {
-            this.name = name;
-        }
-        if(!description.isEmpty() && description.length() < 90) {
-            this.description = description;
-        }
+        this.name = name;
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(name, category.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     public Long getId() {

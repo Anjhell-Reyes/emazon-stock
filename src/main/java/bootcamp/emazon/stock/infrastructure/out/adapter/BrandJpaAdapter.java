@@ -1,11 +1,11 @@
 package bootcamp.emazon.stock.infrastructure.out.adapter;
 
+import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
 import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
-import bootcamp.emazon.stock.infrastructure.exception.BrandAlreadyExistsException;
-import bootcamp.emazon.stock.infrastructure.exception.BrandNotFoundException;
-import bootcamp.emazon.stock.infrastructure.exception.NoDataFoundException;
+import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
+import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.BrandEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.IBrandRepository;
@@ -35,7 +35,7 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
     @Override
     public Brand saveBrand(Brand brand){
         if(brandRepository.findByName(brand.getName()).isPresent()){
-            throw new BrandAlreadyExistsException();
+            throw new DescriptionMax120CharactersException.BrandAlreadyExistsException();
         }
         brandRepository.save(brandEntityMapper.toEntity(brand));
         return brand;
@@ -57,6 +57,14 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
 
         return page.stream()
                 .map(this::toBrandPaginated)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Brand> getAll(){
+        List<BrandEntity> brandEntities = brandRepository.findAll();
+        return brandEntities.stream()
+                .map(brandEntityMapper::toBrand)
                 .collect(Collectors.toList());
     }
 

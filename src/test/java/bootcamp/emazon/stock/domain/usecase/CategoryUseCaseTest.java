@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
@@ -28,104 +27,116 @@ public class CategoryUseCaseTest {
     @InjectMocks
     private CategoryUseCase categoryUseCase;
 
-    @Test
-    void testSaveCategory_Success() {
-        // Arrange
-        Category category = new Category(1L, "ValidName", "ValidDescription");
-        when(categoryPersistencePort.saveCategory(any(Category.class))).thenReturn(category);
+    private Category category;
 
-        // Act
-        Category result = categoryUseCase.saveCategory(category);
-
-        // Assert
-        assertEquals(category, result);
-        verify(categoryPersistencePort, times(1)).saveCategory(category);
+    @BeforeEach
+    void setUp() {
+        category = new Category(1L, "Electronics", "Devices and gadgets");
     }
 
     @Test
-    void testSaveCategory_InvalidName() {
-        // Arrange
-        Category category = new Category(1L, "", "ValidDescription");
+    void saveCategory_Success() {
+        when(categoryPersistencePort.saveCategory(any(Category.class))).thenReturn(category);
 
-        // Act & Assert
+        Category savedCategory = categoryUseCase.saveCategory(category);
+
+        assertNotNull(savedCategory);
+        assertEquals(category.getName(), savedCategory.getName());
+        verify(categoryPersistencePort, times(1)).saveCategory(any(Category.class));
+    }
+
+    @Test
+    void saveCategory_ShouldThrowNamenotnullException_WhenNameIsNull() {
+        category.setName(null);
+
         assertThrows(NamenotnullException.class, () -> categoryUseCase.saveCategory(category));
     }
 
     @Test
-    void testSaveCategory_InvalidDescription() {
-        // Arrange
-        Category category = new Category(1L, "ValidName", "");
+    void saveCategory_ShouldThrowNameMax50CharactersException_WhenNameExceedsMaxLength() {
+        category.setName("A".repeat(51)); // nombre de 51 caracteres
 
-        // Act & Assert
+        assertThrows(NameMax50CharactersException.class, () -> categoryUseCase.saveCategory(category));
+    }
+
+    @Test
+    void saveCategory_ShouldThrowDescriptionNotnullException_WhenDescriptionIsNull() {
+        category.setDescription(null);
+
         assertThrows(DescriptionNotnullException.class, () -> categoryUseCase.saveCategory(category));
     }
 
     @Test
-    void testGetCategory_Success() {
-        // Arrange
-        Category category = new Category(1L, "ValidName", "ValidDescription");
-        when(categoryPersistencePort.getCategory("ValidName")).thenReturn(category);
+    void saveCategory_ShouldThrowDescriptionEmptyException_WhenDescriptionIsEmpty() {
+        category.setDescription("");
 
-        // Act
-        Category result = categoryUseCase.getCategory("ValidName");
-
-        // Assert
-        assertEquals(category, result);
-        verify(categoryPersistencePort, times(1)).getCategory("ValidName");
+        assertThrows(DescriptionEmptyException.class, () -> categoryUseCase.saveCategory(category));
     }
 
     @Test
-    void testGetAllCategories_Success() {
-        // Arrange
-        CategoryPaginated paginatedCategory = new CategoryPaginated(1L, "ValidName", "ValidDescription");
-        List<CategoryPaginated> categories = Collections.singletonList(paginatedCategory);
-        when(categoryPersistencePort.getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(categories);
+    void saveCategory_ShouldThrowDescriptionMax90CharactersException_WhenDescriptionExceedsMaxLength() {
+        category.setDescription("A".repeat(91)); // descripción de 91 caracteres
 
-        // Act
-        List<CategoryPaginated> result = categoryUseCase.getAllCategories(1, 10, "name", true);
-
-        // Assert
-        assertEquals(categories, result);
-        verify(categoryPersistencePort, times(1)).getAllCategories(0, 10, "name", true);
+        assertThrows(DescriptionMax90CharactersException.class, () -> categoryUseCase.saveCategory(category));
     }
 
     @Test
-    void testGetAllCategories_InvalidPage() {
-        // Act & Assert
+    void getCategory_Success() {
+        when(categoryPersistencePort.getCategory(anyString())).thenReturn(category);
+
+        Category foundCategory = categoryUseCase.getCategory("Electronics");
+
+        assertNotNull(foundCategory);
+        assertEquals("Electronics", foundCategory.getName());
+        verify(categoryPersistencePort, times(1)).getCategory(anyString());
+    }
+
+    @Test
+    void getAllCategories_Success() {
+        List<CategoryPaginated> paginatedCategories = Collections.singletonList(new CategoryPaginated(1L, "Electronics", "Devices"));
+        when(categoryPersistencePort.getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(paginatedCategories);
+
+        List<CategoryPaginated> categories = categoryUseCase.getAllCategories(1, 10, "name", true);
+
+        assertNotNull(categories);
+        assertEquals(1, categories.size());
+        verify(categoryPersistencePort, times(1)).getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void getAllCategories_ShouldThrowInvalidPageIndexException_WhenPageIsNegative() {
         assertThrows(InvalidPageIndexException.class, () -> categoryUseCase.getAllCategories(-1, 10, "name", true));
     }
 
     @Test
-    void testUpdateCategory_Success() {
-        // Arrange
-        Category category = new Category(1L, "ValidName", "ValidDescription");
+    void updateCategory_Success() {
         doNothing().when(categoryPersistencePort).updateCategory(any(Category.class));
 
-        // Act
-        assertDoesNotThrow(() -> categoryUseCase.updateCategory(category));
+        categoryUseCase.updateCategory(category);
 
-        // Assert
-        verify(categoryPersistencePort, times(1)).updateCategory(category);
+        verify(categoryPersistencePort, times(1)).updateCategory(any(Category.class));
     }
 
     @Test
-    void testUpdateCategory_InvalidName() {
-        // Arrange
-        Category category = new Category(1L, "", "ValidDescription");
+    void updateCategory_ShouldThrowNamenotnullException_WhenNameIsNull() {
+        category.setName(null);
 
-        // Act & Assert
         assertThrows(NamenotnullException.class, () -> categoryUseCase.updateCategory(category));
     }
 
     @Test
-    void testDeleteCategory_Success() {
-        // Arrange
-        doNothing().when(categoryPersistencePort).deleteCategory("ValidName");
+    void updateCategory_ShouldThrowDescriptionNotnullException_WhenDescriptionIsNull() {
+        category.setDescription(null);
 
-        // Act
-        assertDoesNotThrow(() -> categoryUseCase.deleteCategory("ValidName"));
+        assertThrows(DescriptionNotnullException.class, () -> categoryUseCase.updateCategory(category));
+    }
 
-        // Assert
-        verify(categoryPersistencePort, times(1)).deleteCategory("ValidName");
+    @Test
+    void deleteCategory_Success() {
+        doNothing().when(categoryPersistencePort).deleteCategory(anyString());
+
+        categoryUseCase.deleteCategory("Electronics");
+
+        verify(categoryPersistencePort, times(1)).deleteCategory(anyString());
     }
 }

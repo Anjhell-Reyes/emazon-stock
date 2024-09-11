@@ -39,6 +39,7 @@ public class CategoryUseCase implements ICategoryServicePort {
             if(category.getDescription().length() > maxLenghtDescription) {
                 throw new DescriptionMax90CharactersException();
             }
+
             return categoryPersistencePort.saveCategory(category);
         }
 

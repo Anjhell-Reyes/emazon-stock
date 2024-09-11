@@ -14,6 +14,8 @@ public interface IBrandServicePort {
 
     List<BrandPaginated> getAllBrands(int page, int size, String sortBy, boolean asc);
 
+    List<Brand> getAll();
+
     void updateBrand(Brand brand);
     void deleteBrand(String brandName);
 }

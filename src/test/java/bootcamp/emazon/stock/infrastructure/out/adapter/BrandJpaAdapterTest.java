@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
 import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.infrastructure.exception.BrandAlreadyExistsException;
-import bootcamp.emazon.stock.infrastructure.exception.BrandNotFoundException;
-import bootcamp.emazon.stock.infrastructure.exception.NoDataFoundException;
+import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
+import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.BrandEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.IBrandRepository;
@@ -43,7 +43,7 @@ public class BrandJpaAdapterTest {
         brand.setDescription("Test Description");
         when(brandRepository.findByName(anyString())).thenReturn(Optional.of(new BrandEntity()));
 
-        assertThrows(BrandAlreadyExistsException.class, () -> brandJpaAdapter.saveBrand(brand));
+        assertThrows(DescriptionMax120CharactersException.BrandAlreadyExistsException.class, () -> brandJpaAdapter.saveBrand(brand));
     }
 
     @Test

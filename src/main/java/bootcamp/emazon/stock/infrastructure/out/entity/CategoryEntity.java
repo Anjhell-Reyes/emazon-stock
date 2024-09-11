@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "category")
 @Data
@@ -18,4 +21,8 @@ public class CategoryEntity {
 
         @Column(nullable = false, length = 90)
         private String description;
+
+        @ManyToMany(mappedBy = "categories")
+        private Set<ArticleEntity> articles = new HashSet<>();
+
 }

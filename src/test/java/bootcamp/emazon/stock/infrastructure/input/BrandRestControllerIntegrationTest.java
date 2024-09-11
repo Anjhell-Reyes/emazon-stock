@@ -3,14 +3,12 @@ package bootcamp.emazon.stock.infrastructure.input;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.handler.brandHandler.IBrandHandler;
+import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
 import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.infrastructure.exception.BrandAlreadyExistsException;
-import bootcamp.emazon.stock.infrastructure.exception.BrandNotFoundException;
-import bootcamp.emazon.stock.infrastructure.exception.NoDataFoundException;
+import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
+import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -57,7 +55,7 @@ class BrandRestControllerIntegrationTest {
         BrandRequest brandRequest = new BrandRequest();
         brandRequest.setName("Test Brand");
         brandRequest.setDescription("Test Description");
-        doThrow(new BrandAlreadyExistsException()).when(brandHandler).saveBrandInStock(any(BrandRequest.class));
+        doThrow(new DescriptionMax120CharactersException.BrandAlreadyExistsException()).when(brandHandler).saveBrandInStock(any(BrandRequest.class));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/brands")
                         .contentType(MediaType.APPLICATION_JSON)

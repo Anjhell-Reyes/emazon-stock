@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "brand")
 @Data
@@ -18,4 +21,8 @@ public class BrandEntity {
 
     @Column(nullable = false, length = 120)
     private String description;
+
+    @OneToMany(mappedBy = "brand")
+    private Set<ArticleEntity> articles = new HashSet<>();
+
 }

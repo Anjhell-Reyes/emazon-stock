@@ -1,8 +1,10 @@
 package bootcamp.emazon.stock.infrastructure.out.adapter;
 
+import bootcamp.emazon.stock.domain.exception.CategoryAlreadyExistsException;
+import bootcamp.emazon.stock.domain.exception.CategoryNotFoundException;
+import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Category;
 import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
-import bootcamp.emazon.stock.infrastructure.exception.*;
 import bootcamp.emazon.stock.infrastructure.out.entity.CategoryEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.ICategoryRepository;

@@ -5,15 +5,18 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.mapper.BrandMapper;
 import bootcamp.emazon.stock.domain.api.IBrandServicePort;
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,26 +101,60 @@ class BrandHandlerTest {
     }
 
     @Test
-    void testGetAllBrandsFromStock() {
-        // Datos simulados
-        int page = 0;
+    void testGetAllBrandsFromStockSuccessfully() {
+        // Arrange
+        int page = 1;
+        int size = 1;
+        String sortBy = "name";
+        boolean asc = true;
+
+        Brand brand = new Brand(1L, "Sony", "Electronics Brand");
+        BrandPaginated brandPaginated = new BrandPaginated();
+        brandPaginated.setName("Sony");
+        brandPaginated.setDescription("Electronics Brand");
+        List<Brand> brands = Collections.singletonList(brand);
+
+        CustomPage<Brand> customPage = new CustomPage<>(brands, page, size, brands.size());
+
+        when(brandServicePort.getAllBrands(page, size, sortBy, asc)).thenReturn(customPage);
+        when(brandMapper.toBrandPaginated(brand)).thenReturn(brandPaginated);
+
+        // Act
+        Page<BrandPaginated> result = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(1, result.getContent().size());
+        assertEquals("Sony", result.getContent().get(0).getName());
+
+        verify(brandServicePort, times(1)).getAllBrands(page, size, sortBy, asc);
+        verify(brandMapper, times(1)).toBrandPaginated(brand);
+    }
+
+    @Test
+    void testGetAllBrandsFromStockEmptyResult() {
+        // Arrange
+        int page = 1;
         int size = 10;
         String sortBy = "name";
         boolean asc = true;
 
-        BrandPaginated brand1 = new BrandPaginated(1L, "Brand 1", "Description 1");
-        BrandPaginated brand2 = new BrandPaginated(2L, "Brand 2", "Description 2");
+        List<Brand> brands = Collections.emptyList();
+        CustomPage<Brand> customPage = new CustomPage<>(brands, page, size, 0);
 
-        List<BrandPaginated> expectedBrands = Arrays.asList(brand1, brand2);
+        when(brandServicePort.getAllBrands(page, size, sortBy, asc)).thenReturn(customPage);
 
-        // Simulación del comportamiento del mock
-        when(brandServicePort.getAllBrands(page, size, sortBy, asc)).thenReturn(expectedBrands);
+        // Act
+        Page<BrandPaginated> result = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
 
-        // Llamada al método a probar
-        List<BrandPaginated> actualBrands = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        assertEquals(0, result.getContent().size());
 
-        // Verificación de resultados
-        assertEquals(expectedBrands, actualBrands);
+        verify(brandServicePort, times(1)).getAllBrands(page, size, sortBy, asc);
+        verify(brandMapper, never()).toBrandPaginated(any(Brand.class));
     }
 
     @Test

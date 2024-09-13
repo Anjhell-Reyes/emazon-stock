@@ -1,10 +1,9 @@
 package bootcamp.emazon.stock.application.handler.categoryHandler;
 
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ICategoryHandler {
 
@@ -15,6 +14,6 @@ public interface ICategoryHandler {
     void updateCategoryInStock(CategoryRequest categoryRequest);
     void deleteCategoryInStock(String categoryName);
 
-    List<CategoryPaginated> getAllCategoriesFromStock(int page, int size, String sortBy, boolean asc);
+    Page<CategoryPaginated> getAllCategoriesFromStock(int page, int size, String sortBy, boolean asc);
 
 }

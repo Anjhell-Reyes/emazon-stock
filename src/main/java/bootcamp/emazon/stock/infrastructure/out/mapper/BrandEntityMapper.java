@@ -1,10 +1,8 @@
 package bootcamp.emazon.stock.infrastructure.out.mapper;
 
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
-import bootcamp.emazon.stock.infrastructure.out.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

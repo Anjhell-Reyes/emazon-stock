@@ -1,5 +1,6 @@
 package bootcamp.emazon.stock.application.mapper;
 
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.domain.model.Brand;
@@ -14,4 +15,5 @@ public interface BrandMapper {
     Brand toBrand(BrandRequest brandRequest);
     BrandResponse toResponse(Brand brand);
 
+    BrandPaginated toBrandPaginated(Brand brand);
 }

@@ -13,7 +13,7 @@ public enum ExceptionResponse {
     NAME_MAX_LENGHT("Name must be 50 characters or less"),
     DESCRIPTION_MAX_LENGHT("Description must be 90 characters or less"),
     DESCRIPTION_MAX_LENGHT_BRAND("Description must be 120 characters or less"),
-    PAGE_INVALID("Page index must not be less than zero"),
+    PAGE_INVALID("CustomPage index must not be less than zero"),
     INVALID_NUMBER_CATEGORIES("The article must have between 1 and 3 categories"),
     DUPLICATE_CATEGORIES("The article cannot have repeated categories");
 

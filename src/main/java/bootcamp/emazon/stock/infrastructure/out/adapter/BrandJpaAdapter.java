@@ -2,7 +2,6 @@ package bootcamp.emazon.stock.infrastructure.out.adapter;
 
 import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
 import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
@@ -46,17 +45,17 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
     }
 
     @Override
-    public List<BrandPaginated> getAllBrands(int offset, int limit, String sortBy, boolean asc) {
+    public List<Brand> getAllBrands(int offset, int limit, String sortBy, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(offset / limit, limit, sort);
-        Page<BrandEntity> page = brandRepository.findAll(pageable);
 
-        if (page.isEmpty()) {
+        Page<BrandEntity> brandPage = brandRepository.findAll(pageable);
+
+        if (brandPage.isEmpty()) {
             throw new NoDataFoundException();
         }
-
-        return page.stream()
-                .map(this::toBrandPaginated)
+        return brandPage.getContent().stream()
+                .map(brandEntityMapper::toBrand)
                 .collect(Collectors.toList());
     }
 
@@ -68,14 +67,14 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
                 .collect(Collectors.toList());
     }
 
-    private BrandPaginated toBrandPaginated(BrandEntity brandEntity) {
-        return new BrandPaginated(brandEntity.getId(), brandEntity.getName(), brandEntity.getDescription());
-    }
-
-
     @Override
     public void updateBrand(Brand brand) { brandRepository.save(brandEntityMapper.toEntity(brand));}
 
     @Override
     public void deleteBrand(String brandName){ brandRepository.deleteByName(brandName);}
+
+    @Override
+    public long countBrands() {
+        return brandRepository.count();
+    }
 }

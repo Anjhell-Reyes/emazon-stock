@@ -2,7 +2,8 @@ package bootcamp.emazon.stock.domain.usecase;
 
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,18 +92,6 @@ class BrandUseCaseTest {
     }
 
     @Test
-    void getAllBrands_Success() {
-        List<BrandPaginated> paginatedBrands = Collections.singletonList(new BrandPaginated(1L, "Samsung", "Technology"));
-        when(brandPersistencePort.getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(paginatedBrands);
-
-        List<BrandPaginated> brands = brandUseCase.getAllBrands(1, 10, "name", true);
-
-        assertNotNull(brands);
-        assertEquals(1, brands.size());
-        verify(brandPersistencePort, times(1)).getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean());
-    }
-
-    @Test
     void getAllBrands_ShouldThrowInvalidPageIndexException_WhenPageIsNegative() {
         assertThrows(InvalidPageIndexException.class, () -> brandUseCase.getAllBrands(-1, 10, "name", true));
     }
@@ -117,6 +106,52 @@ class BrandUseCaseTest {
         assertNotNull(allBrands);
         assertEquals(1, allBrands.size());
         verify(brandPersistencePort, times(1)).getAll();
+    }
+
+    @Test
+    void testGetAllBrandsSuccessfully() {
+        // Arrange
+        int page = 1;
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+        int offset = (page - 1) * size;
+
+        List<Brand> brands = Collections.singletonList(new Brand(1L, "Sony", "Electronics Brand"));
+        long totalElements = 1L;
+
+        // Mocking
+        when(brandPersistencePort.getAllBrands(offset, size, sortBy, asc)).thenReturn(brands);
+        when(brandPersistencePort.countBrands()).thenReturn(totalElements);
+
+        // Act
+        CustomPage<Brand> result = brandUseCase.getAllBrands(page, size, sortBy, asc);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals(page, result.getPageNumber());
+        assertEquals(size, result.getPageSize());
+        assertEquals(totalElements, result.getTotalElements());
+
+        verify(brandPersistencePort, times(1)).getAllBrands(offset, size, sortBy, asc);
+        verify(brandPersistencePort, times(1)).countBrands();
+    }
+
+    @Test
+    void testGetAllBrandsThrowsInvalidPageIndexException() {
+        // Arrange
+        int page = -1; // Valor inválido
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+
+        // Act & Assert
+        assertThrows(InvalidPageIndexException.class, () -> brandUseCase.getAllBrands(page, size, sortBy, asc));
+
+        // No se debe llamar a estos métodos
+        verify(brandPersistencePort, never()).getAllBrands(anyInt(), anyInt(), anyString(), anyBoolean());
+        verify(brandPersistencePort, never()).countBrands();
     }
 
     @Test

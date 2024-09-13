@@ -3,6 +3,7 @@ package bootcamp.emazon.stock.application.mapper;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
 import bootcamp.emazon.stock.domain.model.Category;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -14,4 +15,5 @@ public interface CategoryMapper {
     Category toCategory(CategoryRequest categoryRequest);
     CategoryResponse toResponse(Category category);
 
+    CategoryPaginated toCategoryPaginated(Category category);
 }

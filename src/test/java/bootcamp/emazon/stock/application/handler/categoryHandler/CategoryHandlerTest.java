@@ -1,19 +1,22 @@
 package bootcamp.emazon.stock.application.handler.categoryHandler;
 
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
 import bootcamp.emazon.stock.application.mapper.CategoryMapper;
 import bootcamp.emazon.stock.domain.api.ICategoryServicePort;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,26 +103,60 @@ class CategoryHandlerTest {
     }
 
     @Test
-    void testGetAllCategoriesFromStock() {
-        // Datos simulados
-        int page = 0;
+    void testGetAllCategoriesFromStockSuccessfully() {
+        // Arrange
+        int page = 1;
+        int size = 1;
+        String sortBy = "name";
+        boolean asc = true;
+
+        Category category = new Category(1L, "Electronics", "All electronic items");
+        CategoryPaginated categoryPaginated = new CategoryPaginated();
+        categoryPaginated.setName("Electronics");
+        categoryPaginated.setDescription("All electronic items");
+        List<Category> categories = Collections.singletonList(category);
+
+        CustomPage<Category> customPage = new CustomPage<>(categories, page, size, categories.size());
+
+        when(categoryServicePort.getAllCategories(page, size, sortBy, asc)).thenReturn(customPage);
+        when(categoryMapper.toCategoryPaginated(category)).thenReturn(categoryPaginated);
+
+        // Act
+        Page<CategoryPaginated> result = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(1, result.getContent().size());
+        assertEquals("Electronics", result.getContent().get(0).getName());
+
+        verify(categoryServicePort, times(1)).getAllCategories(page, size, sortBy, asc);
+        verify(categoryMapper, times(1)).toCategoryPaginated(category);
+    }
+
+    @Test
+    void testGetAllCategoriesFromStockEmptyResult() {
+        // Arrange
+        int page = 1;
         int size = 10;
         String sortBy = "name";
         boolean asc = true;
 
-        CategoryPaginated category1 = new CategoryPaginated(1L, "Category 1", "Description 1");
-        CategoryPaginated category2 = new CategoryPaginated(2L, "Category 2", "Description 2");
+        List<Category> categories = Collections.emptyList();
+        CustomPage<Category> customPage = new CustomPage<>(categories, page, size, 0);
 
-        List<CategoryPaginated> expectedCategories = Arrays.asList(category1, category2);
+        when(categoryServicePort.getAllCategories(page, size, sortBy, asc)).thenReturn(customPage);
 
-        // Simulación del comportamiento del mock
-        when(categoryServicePort.getAllCategories(page, size, sortBy, asc)).thenReturn(expectedCategories);
+        // Act
+        Page<CategoryPaginated> result = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
 
-        // Llamada al método a probar
-        List<CategoryPaginated> actuallyCategories = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        assertEquals(0, result.getContent().size());
 
-        // Verificación de resultados
-        assertEquals(expectedCategories, actuallyCategories);
+        verify(categoryServicePort, times(1)).getAllCategories(page, size, sortBy, asc);
+        verify(categoryMapper, never()).toCategoryPaginated(any(Category.class)); // No debería mapear nada
     }
 
     @Test

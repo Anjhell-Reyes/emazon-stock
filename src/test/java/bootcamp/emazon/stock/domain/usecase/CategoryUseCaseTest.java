@@ -2,7 +2,8 @@ package bootcamp.emazon.stock.domain.usecase;
 
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,20 +93,49 @@ public class CategoryUseCaseTest {
     }
 
     @Test
-    void getAllCategories_Success() {
-        List<CategoryPaginated> paginatedCategories = Collections.singletonList(new CategoryPaginated(1L, "Electronics", "Devices"));
-        when(categoryPersistencePort.getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(paginatedCategories);
+    void testGetAllCategoriesSuccessfully() {
+        // Arrange
+        int page = 1;
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+        int offset = (page - 1) * size;
 
-        List<CategoryPaginated> categories = categoryUseCase.getAllCategories(1, 10, "name", true);
+        List<Category> categories = Collections.singletonList(new Category(1L, "Electronics", "All electronic items"));
+        long totalElements = 1L;
 
-        assertNotNull(categories);
-        assertEquals(1, categories.size());
-        verify(categoryPersistencePort, times(1)).getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean());
+        // Mocking
+        when(categoryPersistencePort.getAllCategories(offset, size, sortBy, asc)).thenReturn(categories);
+        when(categoryPersistencePort.countArticles()).thenReturn(totalElements);
+
+        // Act
+        CustomPage<Category> result = categoryUseCase.getAllCategories(page, size, sortBy, asc);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals(page, result.getPageNumber());
+        assertEquals(size, result.getPageSize());
+        assertEquals(totalElements, result.getTotalElements());
+
+        verify(categoryPersistencePort, times(1)).getAllCategories(offset, size, sortBy, asc);
+        verify(categoryPersistencePort, times(1)).countArticles();
     }
 
     @Test
-    void getAllCategories_ShouldThrowInvalidPageIndexException_WhenPageIsNegative() {
-        assertThrows(InvalidPageIndexException.class, () -> categoryUseCase.getAllCategories(-1, 10, "name", true));
+    void testGetAllCategoriesThrowsInvalidPageIndexException() {
+        // Arrange
+        int page = -1; // Valor inválido
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+
+        // Act & Assert
+        assertThrows(InvalidPageIndexException.class, () -> categoryUseCase.getAllCategories(page, size, sortBy, asc));
+
+        // No se debe llamar a estos métodos
+        verify(categoryPersistencePort, never()).getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean());
+        verify(categoryPersistencePort, never()).countArticles();
     }
 
     @Test

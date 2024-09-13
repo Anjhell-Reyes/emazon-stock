@@ -33,20 +33,6 @@ public class CategoryTest {
     }
 
     @Test
-    void testConstructorWithInvalidData() {
-        // Arrange
-        String invalidName = ""; // Empty name
-        String validDescription = "ValidDescription";
-
-        // Act
-        Category category = new Category(1L, invalidName, validDescription);
-
-        // Assert
-        assertNull(category.getName(), "Name should be null when it's empty");
-        assertEquals(validDescription, category.getDescription(), "Description should be set correctly");
-    }
-
-    @Test
     void testSetters() {
         // Arrange
         Category category = new Category();

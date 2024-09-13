@@ -4,7 +4,7 @@ import bootcamp.emazon.stock.domain.exception.CategoryAlreadyExistsException;
 import bootcamp.emazon.stock.domain.exception.CategoryNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import bootcamp.emazon.stock.infrastructure.out.entity.CategoryEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.ICategoryRepository;
@@ -87,31 +87,49 @@ public class CategoryJpaAdapterTest {
     }
 
     @Test
-    void testGetAllCategories_NoDataFound() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
-        when(categoryRepository.findAll(pageable)).thenReturn(Page.empty());
+    void testGetAllCategoriesWithResults() {
+        // Arrange
+        int offset = 0;
+        int limit = 10;
+        String sortBy = "name";
+        boolean asc = true;
 
-        assertThrows(NoDataFoundException.class, () -> categoryJpaAdapter.getAllCategories(0, 10, "name", true));
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(offset / limit, limit, sort);
+
+        CategoryEntity categoryEntity = new CategoryEntity(); // Sample category entity
+        Category category = new Category(); // Sample category
+
+        when(categoryRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(categoryEntity)));
+        when(categoryEntityMapper.toCategory(categoryEntity)).thenReturn(category);
+
+        // Act
+        List<Category> result = categoryJpaAdapter.getAllCategories(offset, limit, sortBy, asc);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(category, result.get(0));
+        verify(categoryRepository).findAll(pageable);
+        verify(categoryEntityMapper).toCategory(categoryEntity);
     }
 
     @Test
-    void testGetAllCategories_Success() {
-        CategoryEntity categoryEntity = new CategoryEntity();
-        CategoryPaginated categoryPaginated = new CategoryPaginated();
-        categoryPaginated.setId(1L);
-        categoryPaginated.setName("Test Category");
-        categoryPaginated.setDescription("Test Description");
+    void testGetAllCategoriesNoResults() {
+        // Arrange
+        int offset = 0;
+        int limit = 10;
+        String sortBy = "name";
+        boolean asc = true;
 
-        List<CategoryEntity> entities = Collections.singletonList(categoryEntity);
-        Page<CategoryEntity> page = new PageImpl<>(entities);
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(offset / limit, limit, sort);
 
-        when(categoryRepository.findAll(pageable)).thenReturn(page);
+        when(categoryRepository.findAll(pageable)).thenReturn(Page.empty());
 
-        List<CategoryPaginated> result = categoryJpaAdapter.getAllCategories(0, 10, "name", true);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        // Act & Assert
+        assertThrows(NoDataFoundException.class, () -> categoryJpaAdapter.getAllCategories(offset, limit, sortBy, asc));
+        verify(categoryRepository).findAll(pageable);
     }
 
     @Test

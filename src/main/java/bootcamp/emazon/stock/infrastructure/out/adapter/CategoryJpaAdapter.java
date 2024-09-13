@@ -4,7 +4,6 @@ import bootcamp.emazon.stock.domain.exception.CategoryAlreadyExistsException;
 import bootcamp.emazon.stock.domain.exception.CategoryNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 import bootcamp.emazon.stock.infrastructure.out.entity.CategoryEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
@@ -47,18 +46,18 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
     }
 
     @Override
-    public List<CategoryPaginated> getAllCategories(int offset, int limit, String sortBy, boolean asc) {
+    public List<Category> getAllCategories(int offset, int limit, String sortBy, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(offset / limit, limit, sort);
-        Page<CategoryEntity> page = categoryRepository.findAll(pageable);
-        if(page.isEmpty()){
+
+        Page<CategoryEntity> categoryPage = categoryRepository.findAll(pageable);
+
+        if(categoryPage.isEmpty()){
             throw new NoDataFoundException();
         }
-        return page.stream().map(this::toCategoryPaginated).collect(Collectors.toList());
-    }
-
-    private CategoryPaginated toCategoryPaginated(CategoryEntity categoryEntity) {
-        return new CategoryPaginated(categoryEntity.getId(), categoryEntity.getName(), categoryEntity.getDescription());
+        return categoryPage.getContent().stream()
+                .map(categoryEntityMapper::toCategory)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -66,5 +65,11 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
 
     @Override
     public void deleteCategory(String categoryName){ categoryRepository.deleteByName(categoryName);}
+
+    @Override
+    public long countArticles() {
+        return categoryRepository.count();
+    }
+
 }
 

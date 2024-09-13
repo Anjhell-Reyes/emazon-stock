@@ -3,7 +3,7 @@ package bootcamp.emazon.stock.infrastructure.input;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
 import bootcamp.emazon.stock.application.handler.categoryHandler.ICategoryHandler;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
@@ -56,12 +54,12 @@ public class CategoryRestController {
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @GetMapping
-    public ResponseEntity<List<CategoryPaginated>> getCategoriesFromStock(
+    public ResponseEntity<Page<CategoryPaginated>> getCategoriesFromStock(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "true") boolean asc) {
-        List<CategoryPaginated> categories = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
+        Page<CategoryPaginated> categories = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
         return ResponseEntity.ok(categories);
     }
 

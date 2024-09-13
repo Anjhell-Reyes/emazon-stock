@@ -2,10 +2,8 @@ package bootcamp.emazon.stock.application.handler.brandHandler;
 
 import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
-
-import java.util.List;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
+import org.springframework.data.domain.Page;
 
 public interface IBrandHandler {
 
@@ -13,7 +11,7 @@ public interface IBrandHandler {
 
     BrandResponse getBrandFromStock(String brandName);
 
-    List<BrandPaginated> getAllBrandsFromStock(int page, int size, String sortBy, boolean asc);
+    Page<BrandPaginated> getAllBrandsFromStock(int page, int size, String sortBy, boolean asc);
 
     void updateBrandInStock(BrandRequest brandRequest);
 

@@ -6,12 +6,17 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.mapper.BrandMapper;
 import bootcamp.emazon.stock.domain.api.IBrandServicePort;
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +38,14 @@ public class BrandHandler implements IBrandHandler{
     }
 
     @Override
-    public List<BrandPaginated> getAllBrandsFromStock(int page, int size, String sortBy, boolean asc) {
-        return brandServicePort.getAllBrands(page, size, sortBy, asc);
+    public Page<BrandPaginated> getAllBrandsFromStock(int page, int size, String sortBy, boolean asc) {
+        CustomPage<Brand> customPage = brandServicePort.getAllBrands(page, size, sortBy, asc);
+
+        List<BrandPaginated> paginatedBrands = customPage.getContent().stream()
+                .map(brandMapper::toBrandPaginated)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(paginatedBrands, PageRequest.of(customPage.getPageNumber(), customPage.getPageSize()), customPage.getTotalElements());
     }
 
     @Override

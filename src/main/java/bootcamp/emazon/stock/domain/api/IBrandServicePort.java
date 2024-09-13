@@ -1,8 +1,7 @@
 package bootcamp.emazon.stock.domain.api;
 
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ public interface IBrandServicePort {
 
     Brand getBrand(String brandName);
 
-    List<BrandPaginated> getAllBrands(int page, int size, String sortBy, boolean asc);
+    CustomPage<Brand> getAllBrands(int page, int size, String sortBy, boolean asc);
 
     List<Brand> getAll();
 

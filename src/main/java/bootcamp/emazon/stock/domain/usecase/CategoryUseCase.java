@@ -5,7 +5,7 @@ package bootcamp.emazon.stock.domain.usecase;
 import bootcamp.emazon.stock.domain.api.ICategoryServicePort;
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+ import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 
 import java.util.List;
@@ -48,14 +48,19 @@ public class CategoryUseCase implements ICategoryServicePort {
             return categoryPersistencePort.getCategory(categoryName);
         }
 
-        @Override
-        public List<CategoryPaginated> getAllCategories(int page, int size, String sortBy, boolean asc) {
-            if (page < 0) {
-                throw new InvalidPageIndexException();
+            @Override
+            public CustomPage<Category> getAllCategories(int page, int size, String sortBy, boolean asc) {
+                if (page < 0) {
+                    throw new InvalidPageIndexException();
+                }
+                int offset = (page - 1) * size;
+
+                List<Category> categories = categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
+
+                long totalElements = categoryPersistencePort.countArticles();
+
+                return new CustomPage<>(categories, page, size, totalElements);
             }
-            int offset = (page - 1) * size;
-            return categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
-        }
 
         @Override
         public void updateCategory(Category category) {

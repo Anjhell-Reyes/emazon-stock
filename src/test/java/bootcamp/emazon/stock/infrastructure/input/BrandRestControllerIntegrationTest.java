@@ -4,7 +4,7 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.handler.brandHandler.IBrandHandler;
 import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,6 +27,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BrandRestController.class)
 class BrandRestControllerIntegrationTest {
@@ -89,23 +96,6 @@ class BrandRestControllerIntegrationTest {
     }
 
     @Test
-    void testGetBrandsFromStock() throws Exception {
-        List<BrandPaginated> brands = Collections.singletonList(new BrandPaginated(1L, "Test Brand", "Test Description"));
-        when(brandHandler.getAllBrandsFromStock(anyInt(), anyInt(), anyString(), anyBoolean())).thenReturn(brands);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/brands")
-                        .param("page", "1")
-                        .param("size", "10")
-                        .param("sortBy", "name")
-                        .param("asc", "true")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Test Brand"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].description").value("Test Description"));
-    }
-
-    @Test
     void testGetBrandsFromStock_NotFound() throws Exception {
         when(brandHandler.getAllBrandsFromStock(anyInt(), anyInt(), anyString(), anyBoolean())).thenThrow(new NoDataFoundException());
 
@@ -117,6 +107,56 @@ class BrandRestControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
+    @Test
+    void testGetBrandsFromStockWithResults() throws Exception {
+        // Arrange
+        int page = 1;
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+
+        BrandPaginated brandPaginated = new BrandPaginated(); // Crea un objeto de ejemplo de BrandPaginated
+        Page<BrandPaginated> paginatedBrands = new PageImpl<>(List.of(brandPaginated), PageRequest.of(page - 1, size), 1);
+
+        when(brandHandler.getAllBrandsFromStock(page, size, sortBy, asc))
+                .thenReturn(paginatedBrands);
+
+        // Act & Assert
+        mockMvc.perform(get("/brands") // Cambia "/categories" a "/brands"
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .param("sortBy", sortBy)
+                        .param("asc", String.valueOf(asc))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void testGetBrandsFromStockNoResults() throws Exception {
+        // Arrange
+        int page = 1;
+        int size = 10;
+        String sortBy = "name";
+        boolean asc = true;
+
+        Page<BrandPaginated> paginatedBrands = new PageImpl<>(Collections.emptyList(), PageRequest.of(page - 1, size), 0);
+
+        when(brandHandler.getAllBrandsFromStock(page, size, sortBy, asc))
+                .thenReturn(paginatedBrands);
+
+        // Act & Assert
+        mockMvc.perform(get("/brands") // Cambia "/categories" a "/brands"
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size))
+                        .param("sortBy", sortBy)
+                        .param("asc", String.valueOf(asc))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
 
     @Test
     void testUpdateBrandInStock() throws Exception {

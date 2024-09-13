@@ -1,9 +1,7 @@
 package bootcamp.emazon.stock.domain.spi;
 
 import bootcamp.emazon.stock.domain.model.Brand;
-import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
-import bootcamp.emazon.stock.domain.pagination.CategoryPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 
 import java.util.List;
 
@@ -12,10 +10,12 @@ public interface IBrandPersistencePort {
 
     Brand getBrand(String brandName);
 
-    List<BrandPaginated> getAllBrands(int offset, int limit, String sortBy, boolean asc);
+    List<Brand> getAllBrands(int offset, int limit, String sortBy, boolean asc);
 
     List<Brand> getAll();
 
     void updateBrand(Brand brand);
     void deleteBrand(String brandName);
+
+    long countBrands();
 }

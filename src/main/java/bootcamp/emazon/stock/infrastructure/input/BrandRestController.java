@@ -3,7 +3,7 @@ package bootcamp.emazon.stock.infrastructure.input;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.handler.brandHandler.IBrandHandler;
-import bootcamp.emazon.stock.domain.pagination.BrandPaginated;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
@@ -55,14 +53,15 @@ public class BrandRestController {
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @GetMapping
-    public ResponseEntity<List<BrandPaginated>> getBrandsFromStock(
+    public ResponseEntity<Page<BrandPaginated>> getBrandsFromStock(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "true") boolean asc) {
-        List<BrandPaginated> brands = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
+        Page<BrandPaginated> brands = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
         return ResponseEntity.ok(brands);
     }
+
 
     @Operation(summary = "Update an existing brand")
     @ApiResponses(value = {

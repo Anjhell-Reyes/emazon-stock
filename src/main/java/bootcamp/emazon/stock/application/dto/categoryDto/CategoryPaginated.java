@@ -1,7 +1,6 @@
-package bootcamp.emazon.stock.domain.pagination;
+package bootcamp.emazon.stock.application.dto.categoryDto;
 
 public class CategoryPaginated {
-    private Long id;
     private String name;
     private String description;
 
@@ -10,19 +9,9 @@ public class CategoryPaginated {
     }
 
     // Constructor con todos los campos
-    public CategoryPaginated(Long id, String name, String description) {
-        this.id = id;
+    public CategoryPaginated(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

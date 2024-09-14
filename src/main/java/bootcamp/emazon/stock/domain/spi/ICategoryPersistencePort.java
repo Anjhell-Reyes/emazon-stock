@@ -15,5 +15,5 @@ public interface ICategoryPersistencePort {
     void updateCategory(Category category);
     void deleteCategory(String categoryName);
 
-    long countArticles();
+    long countcategory();
 }

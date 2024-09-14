@@ -6,6 +6,7 @@ import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
+import bootcamp.emazon.stock.domain.utils.Constants;
 
 import java.util.List;
 
@@ -20,13 +21,10 @@ public class BrandUseCase implements IBrandServicePort {
     @Override
     public Brand saveBrand(Brand brand){
 
-        int maxLenghtName = 50;
-        int maxLenghtDescription = 120;
-
         if (brand.getName() == null) {
             throw new NamenotnullException();
         }
-        if(brand.getName().length() > maxLenghtName){
+        if(brand.getName().length() > Constants.MAX_LENGHT_NAME){
             throw new NameMax50CharactersException();
         }
         if (brand.getDescription() == null) {
@@ -35,7 +33,7 @@ public class BrandUseCase implements IBrandServicePort {
         if(brand.getDescription().isEmpty()){
             throw new DescriptionEmptyException();
         }
-        if(brand.getDescription().length() > maxLenghtDescription) {
+        if(brand.getDescription().length() > Constants.MAX_LENGHT_DESCRIPTION_BRAND) {
             throw new DescriptionMax120CharactersException();
         }
         return brandPersistencePort.saveBrand(brand);

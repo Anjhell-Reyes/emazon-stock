@@ -2,7 +2,6 @@ package bootcamp.emazon.stock.domain.usecase;
 
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Category;
-import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
 import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +105,7 @@ public class CategoryUseCaseTest {
 
         // Mocking
         when(categoryPersistencePort.getAllCategories(offset, size, sortBy, asc)).thenReturn(categories);
-        when(categoryPersistencePort.countArticles()).thenReturn(totalElements);
+        when(categoryPersistencePort.countcategory()).thenReturn(totalElements);
 
         // Act
         CustomPage<Category> result = categoryUseCase.getAllCategories(page, size, sortBy, asc);
@@ -119,7 +118,7 @@ public class CategoryUseCaseTest {
         assertEquals(totalElements, result.getTotalElements());
 
         verify(categoryPersistencePort, times(1)).getAllCategories(offset, size, sortBy, asc);
-        verify(categoryPersistencePort, times(1)).countArticles();
+        verify(categoryPersistencePort, times(1)).countcategory();
     }
 
     @Test
@@ -135,7 +134,7 @@ public class CategoryUseCaseTest {
 
         // No se debe llamar a estos métodos
         verify(categoryPersistencePort, never()).getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean());
-        verify(categoryPersistencePort, never()).countArticles();
+        verify(categoryPersistencePort, never()).countcategory();
     }
 
     @Test

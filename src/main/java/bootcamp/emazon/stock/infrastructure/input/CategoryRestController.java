@@ -4,6 +4,7 @@ import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryResponse;
 import bootcamp.emazon.stock.application.handler.categoryHandler.ICategoryHandler;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryPaginated;
+import bootcamp.emazon.stock.domain.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -55,9 +56,9 @@ public class CategoryRestController {
     })
     @GetMapping
     public ResponseEntity<Page<CategoryPaginated>> getCategoriesFromStock(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = Constants.DEFAULT_PAGE) int page,
+            @RequestParam(defaultValue = Constants.DEFAULT_SIZE) int size,
+            @RequestParam(defaultValue = Constants.DEFAULT_SORT_BY) String sortBy,
             @RequestParam(defaultValue = "true") boolean asc) {
         Page<CategoryPaginated> categories = categoryHandler.getAllCategoriesFromStock(page, size, sortBy, asc);
         return ResponseEntity.ok(categories);

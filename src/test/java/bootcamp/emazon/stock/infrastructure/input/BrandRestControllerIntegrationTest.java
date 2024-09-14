@@ -44,7 +44,6 @@ class BrandRestControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Test
     void testSaveBrandInStock() throws Exception {
         BrandRequest brandRequest = new BrandRequest();

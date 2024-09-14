@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "article")
@@ -34,7 +33,7 @@ public class ArticleEntity {
             joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<CategoryEntity> categories = new HashSet<>();
+    private List<CategoryEntity> categories;
 
     @ManyToOne
     @JoinColumn(name = "brand_id", referencedColumnName = "id", nullable = false) // Foreign key column in the Article table

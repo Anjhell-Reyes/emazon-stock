@@ -4,6 +4,7 @@ public enum ExceptionResponse {
 
     CATEGORY_NOT_FOUND("Category not found"),
     BRAND_NOT_FOUND("Brand not found"),
+    ARTICLE_NOT_FOUND("Article not found"),
     CATEGORY_ALREADY_EXISTS("Category already exists"),
     BRAND_ALREADY_EXISTS("Brand already exists"),
     ARTICLE_ALREADY_EXISTS("Article already exists"),

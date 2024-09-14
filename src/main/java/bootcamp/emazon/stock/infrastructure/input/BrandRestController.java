@@ -4,6 +4,7 @@ import bootcamp.emazon.stock.application.dto.brandDto.BrandRequest;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandResponse;
 import bootcamp.emazon.stock.application.handler.brandHandler.IBrandHandler;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
+import bootcamp.emazon.stock.domain.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,9 +55,9 @@ public class BrandRestController {
     })
     @GetMapping
     public ResponseEntity<Page<BrandPaginated>> getBrandsFromStock(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = Constants.DEFAULT_PAGE) int page,
+            @RequestParam(defaultValue = Constants.DEFAULT_SIZE) int size,
+            @RequestParam(defaultValue = Constants.DEFAULT_SORT_BY) String sortBy,
             @RequestParam(defaultValue = "true") boolean asc) {
         Page<BrandPaginated> brands = brandHandler.getAllBrandsFromStock(page, size, sortBy, asc);
         return ResponseEntity.ok(brands);

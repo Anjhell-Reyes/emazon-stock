@@ -67,7 +67,7 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
     public void deleteCategory(String categoryName){ categoryRepository.deleteByName(categoryName);}
 
     @Override
-    public long countArticles() {
+    public long countcategory() {
         return categoryRepository.count();
     }
 

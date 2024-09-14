@@ -52,6 +52,13 @@ public class ControllerAdvisor {
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.BRAND_NOT_FOUND.getMessage()));
     }
 
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleArticleNotFoundException(
+            ArticleNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.ARTICLE_NOT_FOUND.getMessage()));
+    }
+
     @ExceptionHandler(NamenotnullException.class)
     public ResponseEntity<Map<String, String>> handleNamenotnullException(
             NamenotnullException exception) {

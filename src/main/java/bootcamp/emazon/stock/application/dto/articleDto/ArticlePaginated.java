@@ -5,8 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ArticleResponse {
-
+public class ArticlePaginated {
     private String name;
     private String description;
     private Integer quantity;

@@ -5,9 +5,11 @@ import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Article;
 import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.domain.model.Category;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.IArticlePersistencePort;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
+import bootcamp.emazon.stock.domain.utils.Constants;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,27 +29,62 @@ public class ArticleUseCase implements IArticleServicePort {
     }
 
     public Article saveArticle(Article article) {
-
-        //Validation Brands
+        // Validation Brands
         validateBrands(article);
         // Validation Categories
         validateCategories(article);
-
         return articlePersistencePort.saveArticle(article);
     }
 
-    //validation of whether the category is greater than three or if it is null
-    public void validateCategories(Article article) {
+    @Override
+    public Article getArticle(String articleName) {
+        return articlePersistencePort.getArticle(articleName);
+    }
 
+    @Override
+    public CustomPage<Article> getAllArticles(int page, int size, String sortBy, boolean asc) {
+        if (page < 0) {
+            throw new InvalidPageIndexException();
+        }
+        int offset = (page - 1) * size;
+        String sortByField = getSortByField(sortBy);
+        List<Article> articles = articlePersistencePort.getAllArticles(offset, size, sortByField, asc);
+        long totalElements = articlePersistencePort.countArticles();
+        return new CustomPage<>(articles, page, size, totalElements);
+    }
+
+    @Override
+    public void updateArticle(Article article) {
+        if (article.getName() == null) {
+            throw new NamenotnullException();
+        }
+        if (article.getDescription() == null) {
+            throw new DescriptionNotnullException();
+        }
+        articlePersistencePort.updateArticle(article);
+    }
+
+    @Override
+    public void deleteArticle(String articleName) {
+        articlePersistencePort.deleteArticle(articleName);
+    }
+
+    // Validation of whether the category is greater than three or if it is null
+    public void validateCategories(Article article) {
         List<Category> categories = article.getCategories();
 
-        if (categories == null || categories.isEmpty() || categories.size() > 3) {
+        if (categories == null) {
+            throw new InvalidNumberOfCategoriesException();
+        }
+        if (categories.isEmpty()) {
+            throw new InvalidNumberOfCategoriesException();
+        }
+        if (categories.size() > Constants.MAX_CATEGORIES) {
             throw new InvalidNumberOfCategoriesException();
         }
 
         Set<Category> categorySet = new HashSet<>(categories);
-
-        if(categories.size() != categorySet.size()){
+        if (categories.size() != categorySet.size()) {
             throw new DuplicateCategoriesException();
         }
 
@@ -56,8 +93,7 @@ public class ArticleUseCase implements IArticleServicePort {
                     Category existingCategory;
                     try {
                         existingCategory = categoryPersistencePort.getCategory(category.getName());
-
-                    }catch (CategoryNotFoundException e){
+                    } catch (CategoryNotFoundException e) {
                         throw new CategoryNotFoundException();
                     }
                     return existingCategory;
@@ -88,5 +124,13 @@ public class ArticleUseCase implements IArticleServicePort {
         return brandPersistencePort.getAll().stream()
                 .map(Brand::getName)
                 .collect(Collectors.toList());
+    }
+
+    public String getSortByField(String sortBy) {
+        return switch (sortBy) {
+            case "brandName" -> Constants.SORT_BY_BRAND_NAME;
+            case "categoryNames" -> Constants.SORT_BY_CATEGORY_NAMES;
+            default -> Constants.SORT_BY_DEFAULT;
+        };
     }
 }

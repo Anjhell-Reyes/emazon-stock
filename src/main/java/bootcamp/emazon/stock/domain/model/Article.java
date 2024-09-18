@@ -1,7 +1,6 @@
     package bootcamp.emazon.stock.domain.model;
 
     import java.util.List;
-    import java.util.Set;
 
     public class Article {
         private Long id;

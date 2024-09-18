@@ -10,6 +10,7 @@ import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.application.dto.brandDto.BrandPaginated;
 import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.BrandEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.IBrandRepository;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -81,54 +83,49 @@ public class BrandJpaAdapterTest {
         assertNotNull(result);
         assertEquals("Test Brand", result.getName());
     }
-
     @Test
-    void testGetAllBrandsWithResults() {
-        // Arrange
-        int offset = 0;
-        int limit = 10;
-        String sortBy = "name";
-        boolean asc = true;
+    public void testGetAllBrands_Success() {
+        // Datos de prueba
+        BrandEntity brandEntity1 = new BrandEntity();
+        brandEntity1.setId(1L);
+        brandEntity1.setName("Brand 1");
+        brandEntity1.setDescription("Description 1");
 
-        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(offset / limit, limit, sort);
+        BrandEntity brandEntity2 = new BrandEntity();
+        brandEntity2.setId(2L);
+        brandEntity2.setName("Brand 2");
+        brandEntity2.setDescription("Description 2");
 
-        BrandEntity brandEntity = new BrandEntity(); // Sample brand entity
-        Brand brand = new Brand(); // Sample brand
+        List<BrandEntity> brandEntities = Arrays.asList(brandEntity1, brandEntity2);
 
-        when(brandRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(brandEntity)));
-        when(brandEntityMapper.toBrand(brandEntity)).thenReturn(brand);
+        Page<BrandEntity> brandPage = new PageImpl<>(brandEntities, PageRequest.of(0, 10), 2);
 
-        // Act
-        List<Brand> result = brandJpaAdapter.getAllBrands(offset, limit, sortBy, asc);
+        Brand brand1 = new Brand(1L, "Brand 1", "Description 1");
+        Brand brand2 = new Brand(2L, "Brand 2", "Description 2");
+        List<Brand> brands = Arrays.asList(brand1, brand2);
 
-        // Assert
+        when(brandRepository.findAll(any(Pageable.class))).thenReturn(brandPage);
+        when(brandEntityMapper.toBrand(brandEntity1)).thenReturn(brand1);
+        when(brandEntityMapper.toBrand(brandEntity2)).thenReturn(brand2);
+
+        CustomPage<Brand> result = brandJpaAdapter.getAllBrands(0, 10, "name", true);
+
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(brand, result.get(0));
-        verify(brandRepository).findAll(pageable);
-        verify(brandEntityMapper).toBrand(brandEntity);
+        assertEquals(0, result.getPageNumber());
+        assertEquals(10, result.getPageSize());
+        assertEquals(2, result.getTotalElements());
+        assertEquals(1, result.getTotalPages());
+        assertEquals(brands, result.getContent());
     }
 
     @Test
-    void testGetAllBrandsNoResults() {
-        // Arrange
-        int offset = 0;
-        int limit = 10;
-        String sortBy = "name";
-        boolean asc = true;
+    public void testGetAllBrands_NoDataFound() {
+        Page<BrandEntity> brandPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
 
-        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(offset / limit, limit, sort);
+        when(brandRepository.findAll(any(Pageable.class))).thenReturn(brandPage);
 
-        when(brandRepository.findAll(pageable)).thenReturn(Page.empty());
-
-        // Act & Assert
-        assertThrows(NoDataFoundException.class, () -> brandJpaAdapter.getAllBrands(offset, limit, sortBy, asc));
-        verify(brandRepository).findAll(pageable);
+        assertThrows(NoDataFoundException.class, () -> brandJpaAdapter.getAllBrands(0, 10, "name", true));
     }
-
-
     @Test
     void testUpdateBrand() {
         Brand brand = new Brand();

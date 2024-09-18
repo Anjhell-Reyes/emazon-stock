@@ -44,15 +44,15 @@ public class CategoryUseCase implements ICategoryServicePort {
             return categoryPersistencePort.getCategory(categoryName);
         }
 
-            @Override
-            public CustomPage<Category> getAllCategories(int page, int size, String sortBy, boolean asc) {
-                if (page < 0) {
-                    throw new InvalidPageIndexException();
-                }
-                int offset = (page - 1) * size;
-
-                return categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
+        @Override
+        public CustomPage<Category> getAllCategories(int page, int size, String sortBy, boolean asc) {
+            if (page < 0) {
+                throw new InvalidPageIndexException();
             }
+            int offset = (page - 1) * size;
+
+            return categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
+        }
 
         @Override
         public void updateCategory(Category category) {

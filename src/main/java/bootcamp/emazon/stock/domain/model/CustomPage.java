@@ -18,6 +18,8 @@ public class CustomPage<T> {
         this.totalPages = (int) Math.ceil((double) totalElements / pageSize); // Calcula total de páginas
     }
 
+    public CustomPage() {}
+
     // Getters (Opcionalmente setters si los necesitas)
     public List<T> getContent() {
         return content;
@@ -37,5 +39,26 @@ public class CustomPage<T> {
 
     public int getTotalPages() {
         return totalPages;
+    }
+
+    // Setters
+    public void setContent(List<T> content) {
+        this.content = content;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public void setTotalElements(long totalElements) {
+        this.totalElements = totalElements;
+    }
+
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
     }
 }

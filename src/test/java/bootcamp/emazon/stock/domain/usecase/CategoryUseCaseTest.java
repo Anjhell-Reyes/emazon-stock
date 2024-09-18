@@ -92,7 +92,7 @@ public class CategoryUseCaseTest {
     }
 
     @Test
-    void testGetAllCategoriesSuccessfully() {
+    void testGetAllCategories_ValidPageIndex() {
         // Arrange
         int page = 1;
         int size = 10;
@@ -100,43 +100,34 @@ public class CategoryUseCaseTest {
         boolean asc = true;
         int offset = (page - 1) * size;
 
-        List<Category> categories = Collections.singletonList(new Category(1L, "Electronics", "All electronic items"));
-        long totalElements = 1L;
-
-        // Mocking
-        when(categoryPersistencePort.getAllCategories(offset, size, sortBy, asc)).thenReturn(categories);
-        when(categoryPersistencePort.countcategory()).thenReturn(totalElements);
+        // Mocked response from the persistence port
+        CustomPage<Category> mockedPage = new CustomPage<>();
+        when(categoryPersistencePort.getAllCategories(offset, size, sortBy, asc)).thenReturn(mockedPage);
 
         // Act
         CustomPage<Category> result = categoryUseCase.getAllCategories(page, size, sortBy, asc);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1, result.getContent().size());
-        assertEquals(page, result.getPageNumber());
-        assertEquals(size, result.getPageSize());
-        assertEquals(totalElements, result.getTotalElements());
-
-        verify(categoryPersistencePort, times(1)).getAllCategories(offset, size, sortBy, asc);
-        verify(categoryPersistencePort, times(1)).countcategory();
+        assertEquals(mockedPage, result);
+        verify(categoryPersistencePort).getAllCategories(offset, size, sortBy, asc);
     }
 
     @Test
-    void testGetAllCategoriesThrowsInvalidPageIndexException() {
+    void testGetAllCategories_InvalidPageIndex() {
         // Arrange
-        int page = -1; // Valor inválido
+        int page = -1;
         int size = 10;
         String sortBy = "name";
         boolean asc = true;
 
         // Act & Assert
-        assertThrows(InvalidPageIndexException.class, () -> categoryUseCase.getAllCategories(page, size, sortBy, asc));
+        assertThrows(InvalidPageIndexException.class, () -> {
+            categoryUseCase.getAllCategories(page, size, sortBy, asc);
+        });
 
-        // No se debe llamar a estos métodos
+        // Ensure that the persistence port was not called
         verify(categoryPersistencePort, never()).getAllCategories(anyInt(), anyInt(), anyString(), anyBoolean());
-        verify(categoryPersistencePort, never()).countcategory();
     }
-
     @Test
     void updateCategory_Success() {
         doNothing().when(categoryPersistencePort).updateCategory(any(Category.class));

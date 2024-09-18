@@ -163,31 +163,29 @@ class ArticleUseCaseTest {
     }
 
     @Test
-    void testGetAllArticlesSuccess() {
+    void testGetAllArticles_ValidPageIndex() {
         // Arrange
         int page = 1;
         int size = 10;
         String sortBy = "name";
         boolean asc = true;
         int offset = (page - 1) * size;
+        String sortByField = "name";  // Simular que el método getSortByField convierte "name" correctamente
 
-        List<Article> articles = Arrays.asList(new Article(), new Article());
-        when(articlePersistencePort.getAllArticles(offset, size, sortBy, asc)).thenReturn(articles);
-        when(articlePersistencePort.countArticles()).thenReturn(2L);
+        // Mocked response from the persistence port
+        CustomPage<Article> mockedPage = new CustomPage<>();
+        when(articlePersistencePort.getAllArticles(offset, size, sortByField, asc)).thenReturn(mockedPage);
 
         // Act
         CustomPage<Article> result = articleUseCase.getAllArticles(page, size, sortBy, asc);
 
         // Assert
-        assertEquals(articles, result.getContent());
-        assertEquals(2L, result.getTotalElements());
-        assertEquals(1, result.getTotalPages());
-        verify(articlePersistencePort, times(1)).getAllArticles(offset, size, sortBy, asc);
-        verify(articlePersistencePort, times(1)).countArticles();
+        assertEquals(mockedPage, result);
+        verify(articlePersistencePort).getAllArticles(offset, size, sortByField, asc);
     }
 
     @Test
-    void testGetAllArticlesInvalidPage() {
+    void testGetAllArticles_InvalidPageIndex() {
         // Arrange
         int page = -1;
         int size = 10;
@@ -195,7 +193,12 @@ class ArticleUseCaseTest {
         boolean asc = true;
 
         // Act & Assert
-        assertThrows(InvalidPageIndexException.class, () -> articleUseCase.getAllArticles(page, size, sortBy, asc));
+        assertThrows(InvalidPageIndexException.class, () -> {
+            articleUseCase.getAllArticles(page, size, sortBy, asc);
+        });
+
+        // Ensure that the persistence port was not called
+        verify(articlePersistencePort, never()).getAllArticles(anyInt(), anyInt(), anyString(), anyBoolean());
     }
 
     @Test
@@ -260,7 +263,7 @@ class ArticleUseCaseTest {
     @Test
     void testGetSortByFieldBrandName() {
         // Act
-        String result = articleUseCase.getSortByField("brandName");
+        String result = articleUseCase.getSortByField("brand");
 
         // Assert
         assertEquals("brand.name", result);
@@ -269,7 +272,7 @@ class ArticleUseCaseTest {
     @Test
     void testGetSortByFieldCategoryNames() {
         // Act
-        String result = articleUseCase.getSortByField("categoryNames");
+        String result = articleUseCase.getSortByField("categories");
 
         // Assert
         assertEquals("categories.name", result);

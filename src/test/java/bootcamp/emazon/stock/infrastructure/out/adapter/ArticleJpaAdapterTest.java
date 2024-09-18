@@ -8,7 +8,10 @@ import bootcamp.emazon.stock.domain.exception.ArticleAlreadyExistsException;
 import bootcamp.emazon.stock.domain.exception.ArticleNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Article;
+import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.infrastructure.out.entity.ArticleEntity;
+import bootcamp.emazon.stock.infrastructure.out.entity.BrandEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.ArticleEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
 import bootcamp.emazon.stock.infrastructure.out.repository.IArticleRepository;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,31 +104,66 @@ public class ArticleJpaAdapterTest {
     }
 
     @Test
-    void testGetAllArticles_Success() {
-        ArticleEntity articleEntity = new ArticleEntity();
-        Article article = new Article();
-        List<ArticleEntity> articleEntities = List.of(articleEntity);
-        List<Article> articles = List.of(article);
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
-        Page<ArticleEntity> articlePage = new PageImpl<>(articleEntities, pageable, 1);
-        when(articleRepository.findAll(pageable)).thenReturn(articlePage);
-        when(articleEntityMapper.toArticle(articleEntity)).thenReturn(article);
+    public void testGetAllArticles_Success() {
+        // Datos de prueba
+        ArticleEntity articleEntity1 = new ArticleEntity();
+        articleEntity1.setId(1L);
+        articleEntity1.setName("Article 1");
+        articleEntity1.setDescription("Description 1");
+        articleEntity1.setQuantity(10);
+        articleEntity1.setPrice(100.0);
 
-        List<Article> result = articleJpaAdapter.getAllArticles(0, 10, "name", true);
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setId(2L);
+        brandEntity.setName("Brand");
+        brandEntity.setDescription("Description");
+
+        articleEntity1.setBrand(brandEntity);
+
+        ArticleEntity articleEntity2 = new ArticleEntity();
+        articleEntity2.setId(2L);
+        articleEntity2.setName("Article 2");
+        articleEntity2.setDescription("Description 2");
+        articleEntity2.setQuantity(20);
+        articleEntity2.setPrice(200.0);
+
+        BrandEntity brandEntity2 = new BrandEntity();
+        brandEntity2.setId(2L);
+        brandEntity2.setName("Brand 2");
+        brandEntity2.setDescription("Description 2");
+
+        articleEntity2.setBrand(brandEntity2);
+
+        List<ArticleEntity> articleEntities = Arrays.asList(articleEntity1, articleEntity2);
+
+        Page<ArticleEntity> articlePage = new PageImpl<>(articleEntities, PageRequest.of(0, 10), 2);
+
+        Article article1 = new Article(1L, "Article 1", "Description 1", 10, 100.0, new Brand(1L, "Brand 1", "Description 1"));
+        Article article2 = new Article(2L, "Article 2", "Description 2", 20, 200.0, new Brand(2L, "Brand 2", "Description 2"));
+
+        List<Article> articles = Arrays.asList(article1, article2);
+
+        when(articleRepository.findAll(any(Pageable.class))).thenReturn(articlePage);
+        when(articleEntityMapper.toArticle(articleEntity1)).thenReturn(article1);
+        when(articleEntityMapper.toArticle(articleEntity2)).thenReturn(article2);
+
+        CustomPage<Article> result = articleJpaAdapter.getAllArticles(0, 10, "name", true);
 
         assertNotNull(result);
-        assertEquals(articles, result);
-        verify(articleRepository, times(1)).findAll(pageable);
+        assertEquals(0, result.getPageNumber());
+        assertEquals(10, result.getPageSize());
+        assertEquals(2, result.getTotalElements());
+        assertEquals(1, result.getTotalPages());
+        assertEquals(articles, result.getContent());
     }
 
     @Test
-    void testGetAllArticles_NoData() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
-        when(articleRepository.findAll(pageable)).thenReturn(Page.empty());
+    public void testGetAllArticles_NoDataFound() {
+        Page<ArticleEntity> articlePage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+
+        when(articleRepository.findAll(any(Pageable.class))).thenReturn(articlePage);
 
         assertThrows(NoDataFoundException.class, () -> articleJpaAdapter.getAllArticles(0, 10, "name", true));
-
-        verify(articleRepository, times(1)).findAll(pageable);
     }
 
     @Test
@@ -147,16 +186,5 @@ public class ArticleJpaAdapterTest {
         articleJpaAdapter.deleteArticle(articleName);
 
         verify(articleRepository, times(1)).deleteByName(articleName);
-    }
-
-    @Test
-    void testCountArticles() {
-        long count = 5L;
-        when(articleRepository.count()).thenReturn(count);
-
-        long result = articleJpaAdapter.countArticles();
-
-        assertEquals(count, result);
-        verify(articleRepository, times(1)).count();
     }
 }

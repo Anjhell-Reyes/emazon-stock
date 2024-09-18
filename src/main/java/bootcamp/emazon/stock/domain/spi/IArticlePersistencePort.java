@@ -1,8 +1,7 @@
 package bootcamp.emazon.stock.domain.spi;
 
 import bootcamp.emazon.stock.domain.model.Article;
-
-import java.util.List;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 
 public interface IArticlePersistencePort {
 
@@ -10,10 +9,8 @@ public interface IArticlePersistencePort {
 
     Article getArticle(String articleName);
 
-    List<Article> getAllArticles(int offset, int limit, String sortBy, boolean asc);
+    CustomPage<Article> getAllArticles(int offset, int limit, String sortBy, boolean asc);
 
     void updateArticle(Article article);
     void deleteArticle(String articleName);
-
-    long countArticles();
 }

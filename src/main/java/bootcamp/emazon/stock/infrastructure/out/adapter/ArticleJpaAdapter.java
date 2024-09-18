@@ -2,6 +2,7 @@ package bootcamp.emazon.stock.infrastructure.out.adapter;
 
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Article;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.IArticlePersistencePort;
 import bootcamp.emazon.stock.domain.exception.ArticleAlreadyExistsException;
 import bootcamp.emazon.stock.domain.exception.ArticleNotFoundException;
@@ -48,7 +49,7 @@ public class ArticleJpaAdapter implements IArticlePersistencePort {
     }
 
     @Override
-    public List<Article> getAllArticles(int offset, int limit, String sortBy, boolean asc) {
+    public CustomPage<Article> getAllArticles(int offset, int limit, String sortBy, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(offset / limit, limit, sort);
 
@@ -57,9 +58,17 @@ public class ArticleJpaAdapter implements IArticlePersistencePort {
         if (articlePage.isEmpty()) {
             throw new NoDataFoundException();
         }
-        return articlePage.getContent().stream()
+
+        List<Article> articles =articlePage.getContent().stream()
                 .map(articleEntityMapper::toArticle)
                 .collect(Collectors.toList());
+
+        return new CustomPage<>(
+                articles,
+                articlePage.getNumber(),
+                articlePage.getSize(),
+                articlePage.getTotalElements()
+        );
     }
 
     @Override
@@ -70,10 +79,5 @@ public class ArticleJpaAdapter implements IArticlePersistencePort {
     @Override
     public void deleteArticle(String articleName) {
         articleRepository.deleteByName(articleName);
-    }
-
-    @Override
-    public long countArticles() {
-        return articleRepository.count();
     }
 }

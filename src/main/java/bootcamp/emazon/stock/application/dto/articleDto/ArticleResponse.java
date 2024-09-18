@@ -1,5 +1,7 @@
 package bootcamp.emazon.stock.application.dto.articleDto;
 
+import bootcamp.emazon.stock.application.dto.brandDto.BrandSummaryResponse;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategorySummaryResponse;
 import lombok.Data;
 
 import java.util.List;
@@ -11,6 +13,6 @@ public class ArticleResponse {
     private String description;
     private Integer quantity;
     private double price;
-    private String brandName;
-    private List<String> categoryNames;
+    private BrandSummaryResponse brand;
+    private List<CategorySummaryResponse> categories;
 }

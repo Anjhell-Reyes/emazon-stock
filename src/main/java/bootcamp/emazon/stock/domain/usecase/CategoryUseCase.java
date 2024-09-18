@@ -5,11 +5,9 @@ package bootcamp.emazon.stock.domain.usecase;
 import bootcamp.emazon.stock.domain.api.ICategoryServicePort;
 import bootcamp.emazon.stock.domain.exception.*;
 import bootcamp.emazon.stock.domain.model.Category;
- import bootcamp.emazon.stock.domain.model.CustomPage;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 import bootcamp.emazon.stock.domain.utils.Constants;
-
-import java.util.List;
 
 public class CategoryUseCase implements ICategoryServicePort {
 
@@ -53,11 +51,7 @@ public class CategoryUseCase implements ICategoryServicePort {
                 }
                 int offset = (page - 1) * size;
 
-                List<Category> categories = categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
-
-                long totalElements = categoryPersistencePort.countcategory();
-
-                return new CustomPage<>(categories, page, size, totalElements);
+                return categoryPersistencePort.getAllCategories(offset, size, sortBy, asc);
             }
 
         @Override

@@ -51,11 +51,7 @@ public class BrandUseCase implements IBrandServicePort {
         }
         int offset = (page - 1) * size;
 
-        List<Brand> brands = brandPersistencePort.getAllBrands(offset, size, sortBy, asc);
-
-        long totalElements = brandPersistencePort.countBrands();
-
-        return new CustomPage<>(brands, page, size, totalElements);
+        return brandPersistencePort.getAllBrands(offset, size, sortBy, asc);
     }
 
 

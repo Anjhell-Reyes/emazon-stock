@@ -48,9 +48,7 @@ public class ArticleUseCase implements IArticleServicePort {
         }
         int offset = (page - 1) * size;
         String sortByField = getSortByField(sortBy);
-        List<Article> articles = articlePersistencePort.getAllArticles(offset, size, sortByField, asc);
-        long totalElements = articlePersistencePort.countArticles();
-        return new CustomPage<>(articles, page, size, totalElements);
+        return articlePersistencePort.getAllArticles(offset, size, sortByField, asc);
     }
 
     @Override
@@ -128,8 +126,8 @@ public class ArticleUseCase implements IArticleServicePort {
 
     public String getSortByField(String sortBy) {
         return switch (sortBy) {
-            case "brandName" -> Constants.SORT_BY_BRAND_NAME;
-            case "categoryNames" -> Constants.SORT_BY_CATEGORY_NAMES;
+            case "brand" -> Constants.SORT_BY_BRAND_NAME;
+            case "categories" -> Constants.SORT_BY_CATEGORY_NAMES;
             default -> Constants.SORT_BY_DEFAULT;
         };
     }

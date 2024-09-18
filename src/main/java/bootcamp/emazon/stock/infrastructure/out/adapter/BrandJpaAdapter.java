@@ -2,6 +2,8 @@ package bootcamp.emazon.stock.infrastructure.out.adapter;
 
 import bootcamp.emazon.stock.domain.exception.DescriptionMax120CharactersException;
 import bootcamp.emazon.stock.domain.model.Brand;
+import bootcamp.emazon.stock.domain.model.Category;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.IBrandPersistencePort;
 import bootcamp.emazon.stock.domain.exception.BrandNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
@@ -45,7 +47,7 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
     }
 
     @Override
-    public List<Brand> getAllBrands(int offset, int limit, String sortBy, boolean asc) {
+    public CustomPage<Brand> getAllBrands(int offset, int limit, String sortBy, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(offset / limit, limit, sort);
 
@@ -54,9 +56,17 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
         if (brandPage.isEmpty()) {
             throw new NoDataFoundException();
         }
-        return brandPage.getContent().stream()
+
+        List<Brand> brands =brandPage.getContent().stream()
                 .map(brandEntityMapper::toBrand)
                 .collect(Collectors.toList());
+
+        return new CustomPage<>(
+                brands,
+                brandPage.getNumber(),
+                brandPage.getSize(),
+                brandPage.getTotalElements()
+        );
     }
 
     @Override
@@ -72,9 +82,4 @@ public class BrandJpaAdapter implements IBrandPersistencePort {
 
     @Override
     public void deleteBrand(String brandName){ brandRepository.deleteByName(brandName);}
-
-    @Override
-    public long countBrands() {
-        return brandRepository.count();
-    }
 }

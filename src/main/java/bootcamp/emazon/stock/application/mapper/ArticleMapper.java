@@ -3,13 +3,17 @@ package bootcamp.emazon.stock.application.mapper;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticlePaginated;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleRequest;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleResponse;
+import bootcamp.emazon.stock.application.dto.brandDto.BrandSummaryResponse;
+import bootcamp.emazon.stock.application.dto.categoryDto.CategorySummaryResponse;
 import bootcamp.emazon.stock.domain.model.Article;
+import bootcamp.emazon.stock.domain.model.Brand;
 import bootcamp.emazon.stock.domain.model.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ArticleMapper {
@@ -25,19 +29,24 @@ public interface ArticleMapper {
                 .toList();
     }
 
-    @Mapping(source = "brand.name", target = "brandName")
-    @Mapping(source = "categories", target = "categoryNames", qualifiedByName = "toCategoryNames")
+    @Mapping(source = "brand", target = "brand", qualifiedByName = "toBrandSummaryResponse")
+    @Mapping(source = "categories", target = "categories", qualifiedByName = "toCategorySummaryResponses")
     ArticleResponse toResponse(Article article);
 
 
-    @Mapping(source = "brand.name", target = "brandName")
-    @Mapping(source = "categories", target = "categoryNames", qualifiedByName = "toCategoryNames")
+    @Mapping(source = "brand", target = "brand", qualifiedByName = "toBrandSummaryResponse")
+    @Mapping(source = "categories", target = "categories", qualifiedByName = "toCategorySummaryResponses")
     ArticlePaginated toArticlePaginated(Article article);
 
-    @Named("toCategoryNames")
-    default List<String> toCategoryNames(List<Category> categories) {
+    @Named("toBrandSummaryResponse")
+    default BrandSummaryResponse toBrandSummaryResponse(Brand brand) {
+        return new BrandSummaryResponse(brand.getId(), brand.getName());
+    }
+
+    @Named("toCategorySummaryResponses")
+    default List<CategorySummaryResponse> toCategorySummaryResponses(List<Category> categories) {
         return categories.stream()
-                .map(Category::getName)
-                .toList();
+                .map(category -> new CategorySummaryResponse(category.getId(), category.getName()))
+                .collect(Collectors.toList());
     }
 }

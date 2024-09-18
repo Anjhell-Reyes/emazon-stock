@@ -4,6 +4,7 @@ import bootcamp.emazon.stock.domain.exception.CategoryAlreadyExistsException;
 import bootcamp.emazon.stock.domain.exception.CategoryNotFoundException;
 import bootcamp.emazon.stock.domain.exception.NoDataFoundException;
 import bootcamp.emazon.stock.domain.model.Category;
+import bootcamp.emazon.stock.domain.model.CustomPage;
 import bootcamp.emazon.stock.domain.spi.ICategoryPersistencePort;
 import bootcamp.emazon.stock.infrastructure.out.entity.CategoryEntity;
 import bootcamp.emazon.stock.infrastructure.out.mapper.CategoryEntityMapper;
@@ -46,7 +47,7 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
     }
 
     @Override
-    public List<Category> getAllCategories(int offset, int limit, String sortBy, boolean asc) {
+    public CustomPage<Category> getAllCategories(int offset, int limit, String sortBy, boolean asc) {
         Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(offset / limit, limit, sort);
 
@@ -55,21 +56,24 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
         if(categoryPage.isEmpty()){
             throw new NoDataFoundException();
         }
-        return categoryPage.getContent().stream()
+
+        List<Category> categories = categoryPage.getContent().stream()
                 .map(categoryEntityMapper::toCategory)
                 .collect(Collectors.toList());
+
+        return new CustomPage<>(
+                categories,
+                categoryPage.getNumber(),
+                categoryPage.getSize(),
+                categoryPage.getTotalElements()
+        );
     }
+
 
     @Override
     public void updateCategory(Category category) { categoryRepository.save(categoryEntityMapper.toEntity(category));}
 
     @Override
     public void deleteCategory(String categoryName){ categoryRepository.deleteByName(categoryName);}
-
-    @Override
-    public long countcategory() {
-        return categoryRepository.count();
-    }
-
 }
 

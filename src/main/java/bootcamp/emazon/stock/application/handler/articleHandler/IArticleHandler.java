@@ -3,6 +3,7 @@ package bootcamp.emazon.stock.application.handler.articleHandler;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticlePaginated;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleRequest;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleResponse;
+import bootcamp.emazon.stock.application.dto.articleDto.QuantityRequest;
 import bootcamp.emazon.stock.application.dto.categoryDto.CategoryRequest;
 import org.springframework.data.domain.Page;
 
@@ -18,4 +19,5 @@ public interface IArticleHandler {
 
     Page<ArticlePaginated> getAllArticlesFromStock(int page, int size, String sortBy, boolean asc);
 
+    void updateArticleQuantityInStock(String articleName, QuantityRequest quantityRequest);
 }

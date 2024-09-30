@@ -18,25 +18,50 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-//	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-	testImplementation 'org.mockito:mockito-core:5.3.0'
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	// Database
+	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+	// runtimeOnly 'com.h2database:h2'  // Descomentar si usas H2 para testing local
+
+	// Jackson (JSON serialization/deserialization)
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// Jakarta Validation (Bean Validation API)
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 	runtimeOnly 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// MapStruct (Mapping DTOs and entities)
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	// Swagger/OpenAPI for API documentation
 	implementation 'io.swagger.core.v3:swagger-core:2.2.22'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+	// JAXB (XML Binding)
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+
+	// Security
+	implementation 'org.springframework.security:spring-security-crypto'
+	implementation 'org.mindrot:jbcrypt:0.4'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.mockito:mockito-core:5.3.0'
 }
 
 tasks.named('test') {

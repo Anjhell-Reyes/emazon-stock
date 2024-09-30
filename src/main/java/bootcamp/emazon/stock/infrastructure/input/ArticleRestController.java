@@ -3,6 +3,7 @@ package bootcamp.emazon.stock.infrastructure.input;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticlePaginated;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleRequest;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleResponse;
+import bootcamp.emazon.stock.application.dto.articleDto.QuantityRequest;
 import bootcamp.emazon.stock.application.handler.articleHandler.IArticleHandler;
 import bootcamp.emazon.stock.domain.utils.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +30,7 @@ public class ArticleRestController {
             @ApiResponse(responseCode = "201", description = "Article created", content = @Content),
             @ApiResponse(responseCode = "409", description = "Article already exists", content = @Content)
     })
+    @PreAuthorize("hasAuthority('admin')")
     @PostMapping
     public ResponseEntity<Void> saveArticleInStock(@RequestBody ArticleRequest articleRequest) {
         articleHandler.saveArticleInStock(articleRequest);
@@ -40,9 +43,9 @@ public class ArticleRestController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleResponse.class))),
             @ApiResponse(responseCode = "404", description = "Article not found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping("/{articleName}")
-    public ResponseEntity<ArticleResponse> getArticleFromStock(@Parameter(description = "Name of the article to be returned")
-                                                               @PathVariable(name = "articleName") String articleName) {
+    public ResponseEntity<ArticleResponse> getArticleFromStock(@PathVariable(name = "articleName") String articleName) {
         return ResponseEntity.ok(articleHandler.getArticleFromStock(articleName));
     }
 
@@ -53,6 +56,7 @@ public class ArticleRestController {
                             schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping
     public ResponseEntity<Page<ArticlePaginated>> getArticlesFromStock(
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE) int page,
@@ -68,9 +72,22 @@ public class ArticleRestController {
             @ApiResponse(responseCode = "200", description = "Article updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "Article not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('aux_bodega')")
     @PutMapping
     public ResponseEntity<Void> updateArticleInStock(@RequestBody ArticleRequest articleRequest) {
         articleHandler.updateArticleInStock(articleRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Update quantity")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Article updated", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Article not found", content = @Content)
+    })
+    @PreAuthorize("hasAuthority('aux_bodega')")
+    @PutMapping("/{articleName}/quantity")
+    public ResponseEntity<Void> updateArticleQuantityInStock(@PathVariable String articleName, @RequestBody QuantityRequest quantityRequest) {
+        articleHandler.updateArticleQuantityInStock(articleName, quantityRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -79,6 +96,7 @@ public class ArticleRestController {
             @ApiResponse(responseCode = "200", description = "Article deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Article not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{articleName}")
     public ResponseEntity<Void> deleteArticleFromStock(@PathVariable String articleName) {
         articleHandler.deleteArticleInStock(articleName);

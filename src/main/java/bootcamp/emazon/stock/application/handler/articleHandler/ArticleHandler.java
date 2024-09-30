@@ -3,6 +3,7 @@ package bootcamp.emazon.stock.application.handler.articleHandler;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticlePaginated;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleRequest;
 import bootcamp.emazon.stock.application.dto.articleDto.ArticleResponse;
+import bootcamp.emazon.stock.application.dto.articleDto.QuantityRequest;
 import bootcamp.emazon.stock.application.mapper.ArticleMapper;
 import bootcamp.emazon.stock.domain.api.IArticleServicePort;
 import bootcamp.emazon.stock.domain.model.Article;
@@ -25,6 +26,7 @@ public class ArticleHandler implements  IArticleHandler{
     private final IArticleServicePort articleServicePort;
     private final ArticleMapper articleMapper;
 
+    @Override
     public void saveArticleInStock(ArticleRequest articleRequest){
         Article article = articleMapper.toArticle(articleRequest);
         articleServicePort.saveArticle(article);
@@ -45,6 +47,14 @@ public class ArticleHandler implements  IArticleHandler{
                 .collect(Collectors.toList());
 
         return new PageImpl<>(paginatedArticles, PageRequest.of(customPage.getPageNumber(), customPage.getPageSize()), customPage.getTotalElements());
+    }
+
+    @Override
+    public void updateArticleQuantityInStock(String articleName, QuantityRequest quantityRequest) {
+        Article article = articleServicePort.getArticle(articleName);
+
+        article.setQuantity(article.getQuantity() + quantityRequest.getQuantityToAdd());
+        articleServicePort.updateArticle(article);
     }
 
     @Override

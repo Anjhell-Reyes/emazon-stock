@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +29,7 @@ public class BrandRestController {
             @ApiResponse(responseCode = "201", description = "Brand created", content = @Content),
             @ApiResponse(responseCode = "409", description = "Brand already exists", content = @Content)
     })
+    @PreAuthorize("hasAuthority('admin')")
     @PostMapping
     public ResponseEntity<Void> saveBrandInStock(@RequestBody BrandRequest brandRequest) {
         brandHandler.saveBrandInStock(brandRequest);
@@ -40,6 +42,7 @@ public class BrandRestController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = BrandResponse.class))),
             @ApiResponse(responseCode = "404", description = "Brand not found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping("/{brandName}")
     public ResponseEntity<BrandResponse> getBrandFromStock(@Parameter(description = "id of the brand to be returned")
                                                            @PathVariable(name = "brandName") String brandName) {
@@ -53,6 +56,7 @@ public class BrandRestController {
                             schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping
     public ResponseEntity<Page<BrandPaginated>> getBrandsFromStock(
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE) int page,
@@ -63,12 +67,12 @@ public class BrandRestController {
         return ResponseEntity.ok(brands);
     }
 
-
     @Operation(summary = "Update an existing brand")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Brand updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "Brand not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('aux_bodega')")
     @PutMapping
     public ResponseEntity<Void> updateBrandInStock(@RequestBody BrandRequest brandRequest) {
         brandHandler.updateBrandInStock(brandRequest);
@@ -80,6 +84,7 @@ public class BrandRestController {
             @ApiResponse(responseCode = "200", description = "Brand deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Brand not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{brandName}")
     public ResponseEntity<Void> deleteBrandFromStock(@PathVariable String brandName) {
         brandHandler.deleteBrandInStock(brandName);

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +30,7 @@ public class CategoryRestController {
             @ApiResponse(responseCode = "409", description = "Category already exists", content = @Content)
     })
 
+    @PreAuthorize("hasAuthority('admin')")
     @PostMapping
     public ResponseEntity<Void> saveCategoryInStock(@RequestBody CategoryRequest categoryRequest) {
         categoryHandler.saveCategoryInStock(categoryRequest);
@@ -41,6 +43,7 @@ public class CategoryRestController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryResponse.class))),
             @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping("/{categoryName}")
     public ResponseEntity<CategoryResponse> getCategoryFromStock(@Parameter(description = "id of the categoria to be returned")
                                                                  @PathVariable(name = "categoryName") String categoryName) {
@@ -54,6 +57,7 @@ public class CategoryRestController {
                             schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
+    @PreAuthorize("hasAnyAuthority('aux_bodega', 'admin', 'customer')")
     @GetMapping
     public ResponseEntity<Page<CategoryPaginated>> getCategoriesFromStock(
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE) int page,
@@ -69,6 +73,7 @@ public class CategoryRestController {
             @ApiResponse(responseCode = "200", description = "Category updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "Cateogry not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('aux_bodega')")
     @PutMapping
     public ResponseEntity<Void> updateCategoryInStock(@RequestBody CategoryRequest categoryRequest) {
         categoryHandler.updateCategoryInStock(categoryRequest);
@@ -80,6 +85,7 @@ public class CategoryRestController {
             @ApiResponse(responseCode = "200", description = "Category deleted", content = @Content),
             @ApiResponse(responseCode = "404", description = "Category not found", content = @Content)
     })
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{categoryName}")
     public ResponseEntity<Void> deleteCategoriaFromStock(@PathVariable String categoryName) {
         categoryHandler.deleteCategoryInStock(categoryName);
